@@ -16,9 +16,12 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
+
 public class GuiClient extends Application{
 
-	
+	GridPane board;
+	Checkersquare[][] squares;
+
 	TextField c1, nameField;
 	Button b1, setUserName;
 	HashMap<String, Scene> sceneMap;
@@ -66,6 +69,39 @@ public class GuiClient extends Application{
 		b1 = new Button("Send");
 		b1.setDisable(true);
 		setUserName = new Button("Apply Name");
+
+		board = new GridPane();
+		squares = new Checkersquare[8][8];
+		for(int r = 0; r < 8;++r){
+			for(int c = 0; c < 8;++c){
+				Checkersquare square;
+				if((r == 0 && c % 2 == 1) || (r == 1 && c % 2 == 0) || (r == 2 && c % 2 == 1)){
+					square = new Checkersquare(r,c, Checkersquare.Piece.WHITE);
+				}
+				else if ((r == 6 && c % 2 == 1) || (r == 7 && c % 2 == 0) || (r == 5 && c % 2 == 0)) {
+					square = new Checkersquare(r,c, Checkersquare.Piece.RED);
+				}
+				else {
+					square = new Checkersquare(r, c, Checkersquare.Piece.EMPTY);
+				}
+				square.setPrefSize(80,80);
+//				square.setOnMouseEntered(e -> {
+//					square.setStyle(
+//							"-fx-font-size: 32;"
+//
+//
+//					);
+//				});
+//
+//				square.setOnMouseExited(e -> {
+//					square.setStyle(
+//							"-fx-font-size: 32;"
+//					);
+//				});
+				board.add(square,c,r);
+				squares[r][c] = square;
+			}
+		}
 		b1.setOnAction(e->{
 			if (nameField.getText().isEmpty()) {
 				Message message = new Message(c1.getText(), Message.messageType.GLOBAL);
@@ -116,9 +152,9 @@ public class GuiClient extends Application{
 
 		HBox buttons = new HBox(setUserName, b1);
 		HBox listViews = new HBox(listItems2, listUsers);
-		clientBox = new VBox(10, c1, nameField, buttons, listViews);
+		clientBox = new VBox(10, board,c1, nameField, buttons, listViews);
 		clientBox.setStyle("-fx-background-color: blue;"+"-fx-font-family: 'serif';");
-		return new Scene(clientBox, 500, 400);
+		return new Scene(clientBox, 1000, 1000);
 		
 	}
 
