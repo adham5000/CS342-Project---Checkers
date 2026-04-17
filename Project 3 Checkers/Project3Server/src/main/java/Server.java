@@ -155,6 +155,12 @@ public class Server {
 						msg = new Message(data.getFromRow(),data.getFromCol(),data.getToRow(),data.getToCol(), Message.messageType.CHECKERMOVE);
 						game.getOpponent(this).out.writeObject(msg);
 						out.writeObject(msg);
+						if(game.getTurn() == 1){
+							game.setTurn(2);
+						}
+						else{
+							game.setTurn(1);
+						}
 					}
 					else {
 						msg = new Message("client: " + count + " user: " + userNames.get(count) + ": " + data.returnMessage());
@@ -250,5 +256,25 @@ public class Server {
 		public int getTurn() {
 			return turn;
 		}
+		public void setTurn(int turn) {
+			this.turn = turn;
+		}
+
+		public Message evaluate(int fromRow, int fromCol, int toRow, int toCol) {
+			Message msg;
+			if(toRow == fromRow && toCol == fromCol) {
+				msg = new Message("INVALID MOVE");
+				return msg;
+			}
+
+			if((toRow % 2 == 0 && toCol % 2 == 1) || (toRow % 2 == 1 &&  toCol % 2 == 0)) {
+				msg = new Message("CAN'T MOVE TO A WHITE SQUARE");
+				return msg;
+			}
+
+
+		}
+
 	}
+
 }

@@ -14,10 +14,14 @@ public class Message implements Serializable {
     private String stringMessage;
     private messageType type;
     private ArrayList<String> Users;
+
     private int fromRow;
     private int fromCol;
     private int toRow;
     private int toCol;
+    private ArrayList<Integer> captured;
+    private int kingRow;
+    private int kingCol;
 
     public Message(String stringMessage) {
         this.stringMessage = stringMessage;

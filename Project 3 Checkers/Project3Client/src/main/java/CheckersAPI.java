@@ -94,9 +94,25 @@ public class CheckersAPI {
             }
         }
         else if(msg.msgType() == Message.messageType.CHECKERMOVE){
-            Checkersquare.Piece piece = squares[msg.getFromRow()][msg.getFromCol()].getPiece();
-            squares[msg.getFromRow()][msg.getFromCol()].setPiece(Checkersquare.Piece.EMPTY);
-            squares[msg.getToRow()][msg.getToCol()].setPiece(piece);
+            int fromRow;
+            int fromCol;
+            int toRow;
+            int toCol;
+            if(myColor.equals("RED")){
+                fromRow = msg.getFromRow();
+                fromCol = msg.getFromCol();
+                toRow = msg.getToRow();
+                toCol = msg.getToCol();
+            }
+            else{
+                fromRow = 7 - msg.getFromRow();
+                fromCol = 7 - msg.getFromCol();
+                toRow = 7 - msg.getToRow();
+                toCol = 7 - msg.getToCol();
+            }
+            Checkersquare.Piece piece = squares[fromRow][fromCol].getPiece();
+            squares[fromRow][fromCol].setPiece(Checkersquare.Piece.EMPTY);
+            squares[toRow][toCol].setPiece(piece);
 
         }
         else {
