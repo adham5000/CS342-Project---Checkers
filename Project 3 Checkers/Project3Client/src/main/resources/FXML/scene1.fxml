@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.event.ActionEvent.*?>
+<AnchorPane xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="CheckersAPI">
+   <children>
+      <BorderPane layoutX="184.0" layoutY="88.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
+         <opaqueInsets>
+            <Insets />
+         </opaqueInsets>
+         <center>
+            <VBox BorderPane.alignment="CENTER">
+               <children>
+                  <HBox VBox.vgrow="ALWAYS">
+                     <children>
+                        <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS">
+                           <children>
+                              <Label text="CHATLOG" VBox.vgrow="ALWAYS" />
+                              <ListView fx:id="chatList" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" VBox.vgrow="ALWAYS" />
+                              <TextField fx:id="chatInput" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" VBox.vgrow="ALWAYS" />
+                           </children>
+                        </VBox>
+                        <VBox HBox.hgrow="ALWAYS">
+                           <children>
+                              <Label text="PLAYERNAME" VBox.vgrow="ALWAYS" />
+                              <GridPane fx:id="board" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" VBox.vgrow="ALWAYS"></GridPane>
+                              <Label text="PLAYERNAME" VBox.vgrow="ALWAYS" />
+                           </children>
+                        </VBox>
+                        <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS">
+                           <children>
+                              <Label text="USERLOG" VBox.vgrow="ALWAYS" />
+                              <ListView fx:id="listUsers" VBox.vgrow="ALWAYS" />
+                           </children>
+                        </VBox>
+                     </children>
+                  </HBox>
+                  <Button fx:id="sendBtn" mnemonicParsing="false" text="SEND" VBox.vgrow="ALWAYS" onAction= "#sendButtonHandler"/>
+                  <Button fx:id="setUserName" mnemonicParsing="false" text="NAME" VBox.vgrow="ALWAYS" onAction="#setNameButtonHandler"/>
+                  <TextField fx:id="nameField" VBox.vgrow="ALWAYS" />
+               </children>
+            </VBox>
+         </center>
+      </BorderPane>
+   </children>
+</AnchorPane>
