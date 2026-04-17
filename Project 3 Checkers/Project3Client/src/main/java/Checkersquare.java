@@ -1,3 +1,4 @@
+import javafx.scene.Cursor;
 import javafx.scene.control.Button;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -43,12 +44,16 @@ public class Checkersquare extends Button {
 
     public void setPiece(Piece piece) {
         this.piece = piece;
+        updateVisuals();
     }
 
     private void updateVisuals() {
         if(piece == Piece.EMPTY){
+            setText("");
+            setCursor(Cursor.DEFAULT);
             return;
         }
+        setCursor(Cursor.HAND);
         if (piece == Piece.RED ||  piece == Piece.WHITE) {
             setText("⛀");
         }

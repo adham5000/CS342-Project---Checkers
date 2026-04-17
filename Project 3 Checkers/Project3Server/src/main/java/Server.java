@@ -6,11 +6,15 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.function.Consumer;
 
 import javafx.application.Platform;
 import javafx.scene.control.ListView;
+
+import java.util.Queue;
+import java.util.LinkedList;
 
 public class Server {
 
@@ -19,6 +23,9 @@ public class Server {
 	TheServer server;
 	private Consumer<Serializable> callback;
 	HashMap<Integer, String> userNames = new HashMap<>();
+
+	private final Queue<ClientThread> waitList = new LinkedList<>();
+	private final ArrayList<GameSession> activeGames = new ArrayList<>();
 
 	Server(Consumer<Serializable> call){
 
@@ -58,12 +65,16 @@ public class Server {
 		ObjectInputStream in;
 		ObjectOutputStream out;
 		Message msg;
+		private GameSession game;
+		private int playerColor;
 
 		ClientThread(Socket s, int count){
 			this.connection = s;
 			this.count = count;
 		}
-
+		public void setSession(GameSession game){
+			this.game = game;
+		}
 		public void updateClients(Message message) {
 			if (message.msgType() == Message.messageType.GLOBAL ||  message.msgType() == Message.messageType.USERLOG) {
 				for (int i = 0; i < clients.size(); i++) {
@@ -136,6 +147,15 @@ public class Server {
 								, Message.messageType.GROUP, data.getActiveUsers());
 						updateClients(msg);
 					}
+					else if(data.msgType() == Message.messageType.GAME_START){
+						addToQueue(this);
+					}
+					else if(data.msgType() == Message.messageType.CHECKERMOVE && game!=null && game.getTurn() == playerColor){
+						//boolean validMove = evaluate()
+						msg = new Message(data.getFromRow(),data.getFromCol(),data.getToRow(),data.getToCol(), Message.messageType.CHECKERMOVE);
+						game.getOpponent(this).out.writeObject(msg);
+						out.writeObject(msg);
+					}
 					else {
 						msg = new Message("client: " + count + " user: " + userNames.get(count) + ": " + data.returnMessage());
 						updateClients(msg);
@@ -162,4 +182,73 @@ public class Server {
 		}//end of run
 
 	}//end of client thread
+	public synchronized void addToQueue(ClientThread player) {
+		waitList.add(player);
+
+		if (waitList.size() >= 2) {
+			ClientThread p1 = waitList.poll();
+			ClientThread p2 = waitList.poll();
+
+			startGame(p1, p2);
+		}
+	}
+
+	private void startGame(ClientThread p1, ClientThread p2) {
+		GameSession session = new GameSession(p1, p2);
+		activeGames.add(session);
+
+		p1.setSession(session);
+		p2.setSession(session);
+
+		Message msg = new Message("RED",Message.messageType.GAME_START);
+		try {
+			p1.out.writeObject(msg);
+			msg = new Message("BLACK", Message.messageType.GAME_START);
+			p2.out.writeObject(msg);
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	public class GameSession {
+
+
+		private ClientThread redPlayer;
+		private ClientThread blackPlayer;
+		private int[][] board = new int[8][8];
+		private int turn;
+
+		public GameSession(ClientThread r, ClientThread b) {
+			this.redPlayer = r;
+			this.redPlayer.playerColor = 1;
+			this.blackPlayer = b;
+			this.blackPlayer.playerColor = 2;
+			this.turn = 1;
+			initializeBoard();
+		}
+
+		public ClientThread getOpponent(ClientThread p) {
+			return (p == redPlayer) ? blackPlayer : redPlayer;
+		}
+		private void initializeBoard() {
+			for (int r = 0; r < 8; r++) {
+				for (int c = 0; c < 8; c++) {
+					if((r == 0 && c % 2 == 1) || (r == 1 && c % 2 == 0) || (r == 2 && c % 2 == 1)){
+						board[r][c] = 2;
+					}
+					else if ((r == 6 && c % 2 == 1) || (r == 7 && c % 2 == 0) || (r == 5 && c % 2 == 0)) {
+						board[r][c] = 1;
+					}
+					else {
+						board[r][c] = 0;
+					}
+				}
+			}
+		}
+		public int getTurn() {
+			return turn;
+		}
+	}
 }

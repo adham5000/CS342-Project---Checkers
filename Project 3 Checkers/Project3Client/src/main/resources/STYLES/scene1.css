@@ -1,0 +1,9 @@
+.square:hover{
+    -fx-background-image: none  !important;
+    -fx-background-color: rgba(135, 206, 250, 0.35), transparent !important;
+    -fx-background-insets: 0 !important;
+}
+.selected-square{
+    -fx-background-color: rgba(100, 150, 255, 0.45) !important;
+    -fx-background-insets: 0 !important;
+}

@@ -42,8 +42,11 @@ public class GuiClient extends Application{
 		clientConnection.start();
 		controller.setClient(clientConnection);
 
+		Scene scene = new Scene(root);
+		scene.getStylesheets().add(
+				getClass().getResource("/STYLES/scene1.css").toExternalForm()
+		);
 
-		
 		primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
             @Override
             public void handle(WindowEvent t) {
@@ -52,7 +55,7 @@ public class GuiClient extends Application{
             }
         });
 
-		primaryStage.setScene(new Scene(root));
+		primaryStage.setScene(scene);
 		primaryStage.setTitle("Checkers Client");
 		primaryStage.show();
 		

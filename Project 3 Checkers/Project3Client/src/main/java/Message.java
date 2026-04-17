@@ -6,12 +6,18 @@ public class Message implements Serializable {
         USERNAME, // For setting username
         GLOBAL, // For chat log
         USERLOG, // For showing usernames
-        GROUP, // For creating groups
+        GROUP,// For creating groups
+        CHECKERMOVE,// For moves
+        GAME_START,
     }
 
     private String stringMessage;
     private messageType type;
     private ArrayList<String> Users;
+    private int fromRow;
+    private int fromCol;
+    private int toRow;
+    private int toCol;
 
     public Message(String stringMessage) {
         this.stringMessage = stringMessage;
@@ -34,6 +40,30 @@ public class Message implements Serializable {
         this.type = type;
     }
 
+    public Message(int fromRow,int fromCol, int toRow, int toCol,messageType type){
+        this.fromRow = fromRow;
+        this.fromCol = fromCol;
+        this.toRow = toRow;
+        this.toCol = toCol;
+        this.type = type;
+    }
+
+    public Message(messageType type) {
+        this.type = type;
+    }
+
+    public int getFromRow() {
+        return fromRow;
+    }
+    public int getFromCol() {
+        return fromCol;
+    }
+    public int getToRow() {
+        return toRow;
+    }
+    public int getToCol() {
+        return toCol;
+    }
     public String returnMessage() {return stringMessage;}
     public messageType msgType() {return type;}
     public ArrayList<String> getActiveUsers() { return Users; }
