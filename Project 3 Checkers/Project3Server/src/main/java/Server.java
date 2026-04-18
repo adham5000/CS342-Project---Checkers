@@ -150,20 +150,30 @@ public class Server {
 					else if(data.msgType() == Message.messageType.GAME_START){
 						addToQueue(this);
 					}
-					else if(data.msgType() == Message.messageType.CHECKERMOVE && game!=null && game.getTurn() == playerColor){
-
-						msg = game.evaluate(data.getFromRow(), data.getFromCol(), data.getToRow(), data.getToCol());
-						if(msg.msgType() == Message.messageType.GLOBAL){
+					else if(data.msgType() == Message.messageType.CHECKERMOVE && game!=null){
+						if(game.getTurn() != playerColor){
+							msg = new Message("IT IS NOT YOUR TURN");
 							out.writeObject(msg);
 						}
 						else {
-							game.getOpponent(this).out.writeObject(msg);
-							out.writeObject(msg);
-							if(!game.canMoveAgain) {
-								if (game.getTurn() == 1) {
-									game.setTurn(2);
-								} else {
-									game.setTurn(1);
+							msg = game.evaluate(data.getFromRow(), data.getFromCol(), data.getToRow(), data.getToCol());
+							if (msg.msgType() == Message.messageType.GLOBAL) {
+								out.writeObject(msg);
+							} else {
+								if(game.whiteLost()){
+
+								}
+								if(game.redLost()){
+
+								}
+								game.getOpponent(this).out.writeObject(msg);
+								out.writeObject(msg);
+								if (!game.canMoveAgain) {
+									if (game.getTurn() == 1) {
+										game.setTurn(2);
+									} else {
+										game.setTurn(1);
+									}
 								}
 							}
 						}
@@ -274,7 +284,7 @@ public class Server {
 			int capturedCol = -1;
 			int kingRow = -1;
 			int kingCol = -1;
-
+			int piece;
 			if(toRow == fromRow && toCol == fromCol) {
 				msg = new Message("YOU CANNOT MOVE TO THE SAME SPOT");
 				return msg;
@@ -326,16 +336,36 @@ public class Server {
 				msg = new Message("YOU MUST JUMP IF YOU CAN");
 				return msg;
 			}
-
+			if(isSimpleMove && (turn == 1) && (rowDif != 1) && (board[fromRow][fromCol] == 1)){
+				msg = new Message("YOU CAN ONLY MOVE CHECKERS FORWARD");
+				return msg;
+			}
+			if(isSimpleMove && (turn == 2) && (rowDif != -1) && (board[fromRow][fromCol] == 2)){
+				msg = new Message("YOU CAN ONLY MOVE CHECKERS FORWARD");
+				return msg;
+			}
+			if(isJump && !(Math.abs(rowDif) == 2 && Math.abs(colDif) == 2)) {
+				msg = new Message("YOU CAN ONLY JUMP DIAGONALLY ABOVE ONE ENEMY CHECKER");
+				return msg;
+			}
+			if(isJump && (turn == 1) && (board[fromRow][fromCol] == 1) &&(rowDif != 2)){
+				msg = new Message("YOU CAN ONLY JUMP CHECKERS FORWARD");
+				return msg;
+			}
+			if(isJump && (turn == 2) && (board[fromRow][fromCol] == 2) &&(rowDif != -2)){
+				msg = new Message("YOU CAN ONLY JUMP CHECKERS FORWARD");
+				return msg;
+			}
 			if(isSimpleMove){
-				board[toRow][toCol] = board[fromRow][fromCol];
+				piece = board[fromRow][fromCol];
+				board[toRow][toCol] = piece;
 				board[fromRow][fromCol] = 0;
-				if((toRow == 7 && turn == 1)){
+				if((toRow == 7 && piece == 1)){
 					kingRow = toRow;
 					kingCol = toCol;
 					board[kingRow][kingCol] = 3;
 				}
-				if(toRow == 0 && turn == 2){
+				if(toRow == 0 && piece == 2){
 					kingRow = toRow;
 					kingCol = toCol;
 					board[kingRow][kingCol] = 4;
@@ -348,23 +378,28 @@ public class Server {
 				int jumpedCol = (fromCol + toCol) / 2;
 
 				int jumpedPiece = board[jumpedRow][jumpedCol];
-				if((turn == 1 && jumpedPiece == 1) || (turn == 2 && jumpedPiece == 2)){
+				if((turn == 1 && ((jumpedPiece == 1) || (jumpedPiece == 3))) || (turn == 2 && ((jumpedPiece == 2) || (jumpedPiece == 4)))) {
 					msg = new Message("YOU CANNOT CAPTURE YOUR OWN PIECES");
 					return msg;
 				}
-				board[toRow][toCol] = board[fromRow][fromCol];
+				if(jumpedPiece == 0) {
+					msg = new Message("YOU CANNOT JUMP AN EMPTY SQUARE");
+					return msg;
+				}
+				piece = board[fromRow][fromCol];
+				board[toRow][toCol] = piece;
 				board[fromRow][fromCol] = 0;
 
 				board[jumpedRow][jumpedCol] = 0;
 				capturedRow = jumpedRow;
 				capturedCol = jumpedCol;
 
-				if((toRow == 7 && turn == 1)){
+				if((toRow == 7 && piece == 1)){
 					kingRow = toRow;
 					kingCol = toCol;
 					board[kingRow][kingCol] = 3;
 				}
-				if(toRow == 0 && turn == 2){
+				if(toRow == 0 && piece == 2){
 					kingRow = toRow;
 					kingCol = toCol;
 					board[kingRow][kingCol] = 4;
@@ -402,25 +437,25 @@ public class Server {
 				}
 			}
 			if(board[row][col] == 2 || board[row][col] == 4){
-				if(row + 2 < 8 && col + 2 < 8 && board[row + 2][col + 2] == 0) {
-					if(board[row + 1][col + 1] == 1 || board[row + 1][col + 1] == 3){
+				if(row - 2 >= 0 && col + 2 < 8 && board[row - 2][col + 2] == 0) {
+					if(board[row - 1][col + 1] == 1 || board[row - 1][col + 1] == 3){
 						return true;
 					}
 				}
-				if(row + 2 < 8 && col - 2 >= 0 && board[row + 2][col - 2] == 0) {
-					if(board[row + 1][col - 1] == 1 || board[row + 1][col - 1] == 3){
-						return true;
-					}
-				}
-			}
-			if(board[row][col] == 4){
 				if(row - 2 >= 0 && col - 2 >= 0 && board[row - 2][col - 2] == 0) {
 					if(board[row - 1][col - 1] == 1 || board[row - 1][col - 1] == 3){
 						return true;
 					}
 				}
-				if(row - 2 >= 0 && col + 2 < 8 && board[row - 2][col + 2] == 0) {
-					if(board[row - 1][col + 1] == 1 || board[row - 1][col + 1] == 3){
+			}
+			if(board[row][col] == 4){
+				if(row + 2 < 8 && col - 2 >= 0 && board[row + 2][col - 2] == 0) {
+					if(board[row + 1][col - 1] == 1 || board[row + 1][col - 1] == 3){
+						return true;
+					}
+				}
+				if(row + 2 < 8 && col + 2 < 8 && board[row + 2][col + 2] == 0) {
+					if(board[row + 1][col + 1] == 1 || board[row + 1][col + 1] == 3){
 						return true;
 					}
 				}
@@ -462,18 +497,6 @@ public class Server {
 				for(int r = 0; r < 8; r++) {
 					for(int c = 0; c < 8; c++) {
 						if(board[r][c] == 2 || board[r][c] == 4){
-							if(r + 2 < 8 && c + 2 < 8 && board[r + 2][c + 2] == 0) {
-								if(board[r + 1][c + 1] == 1 || board[r + 1][c + 1] == 3){
-									return true;
-								}
-							}
-							if(r + 2 < 8 && c - 2 >= 0 && board[r + 2][c - 2] == 0) {
-								if(board[r + 1][c - 1] == 1 || board[r + 1][c - 1] == 3){
-									return true;
-								}
-							}
-						}
-						if(board[r][c] == 4){
 							if(r - 2 >= 0 && c - 2 >= 0 && board[r - 2][c - 2] == 0) {
 								if(board[r - 1][c - 1] == 1 || board[r - 1][c - 1] == 3){
 									return true;
@@ -481,6 +504,18 @@ public class Server {
 							}
 							if(r - 2 >= 0 && c + 2 < 8 && board[r - 2][c + 2] == 0) {
 								if(board[r - 1][c + 1] == 1 || board[r - 1][c + 1] == 3){
+									return true;
+								}
+							}
+						}
+						if(board[r][c] == 4){
+							if(r + 2 < 8 && c + 2 < 8 && board[r + 2][c + 2] == 0) {
+								if(board[r + 1][c + 1] == 1 || board[r + 1][c + 1] == 3){
+									return true;
+								}
+							}
+							if(r + 2 < 8 && c - 2 >= 0 && board[r + 2][c - 2] == 0) {
+								if(board[r + 1][c - 1] == 1 || board[r + 1][c - 1] == 3){
 									return true;
 								}
 							}
