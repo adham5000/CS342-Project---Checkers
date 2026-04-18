@@ -28,11 +28,12 @@
                      </children>
                   </VBox>
                   <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
-                        <fx:define>
-                           <ToggleGroup fx:id="gameType"/>
-                        </fx:define>
-                        <RadioButton mnemonicParsing="false" text="Singleplayer" toggleGroup="gameType" selected="true" />
-                        <RadioButton mnemonicParsing="false" text="Multiplayer" toggleGroup="gameType"/>
+                      <RadioButton mnemonicParsing="false" text="Singleplayer" selected="true">
+                            <toggleGroup>
+                                <ToggleGroup fx:id="gameType" />
+                            </toggleGroup>/>
+                        </RadioButton>
+                        <RadioButton mnemonicParsing="false" text="Multiplayer" toggleGroup="$gameType"/>
                   </HBox>
                   <Button alignment="CENTER" mnemonicParsing="false" text="Play Game" />
                </children>

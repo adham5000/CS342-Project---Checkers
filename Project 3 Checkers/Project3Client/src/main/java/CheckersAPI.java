@@ -1,8 +1,5 @@
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 
 import javafx.event.ActionEvent;
@@ -11,6 +8,7 @@ import java.util.Arrays;
 import java.util.Objects;
 
 public class CheckersAPI {
+    @FXML public ToggleGroup gameType;
     @FXML private GridPane board;
     @FXML private ListView<String> chatList;
     @FXML private ListView<String> listUsers;
