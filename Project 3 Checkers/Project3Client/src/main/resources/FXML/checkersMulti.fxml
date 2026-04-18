@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="CheckersAPI">
+   <children>
+      <BorderPane layoutX="2.0" layoutY="2.0" prefHeight="600.0" prefWidth="800.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
+         <center>
+            <VBox prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
+               <children>
+                  <HBox alignment="CENTER" prefHeight="485.0" prefWidth="780.0">
+                     <children>
+                        <VBox prefHeight="470.0" prefWidth="100.0">
+                           <children>
+                              <Label text="Chat:" />
+                              <ListView prefHeight="452.0" prefWidth="100.0" />
+                           </children>
+                        </VBox>
+                        <VBox prefHeight="470.0" prefWidth="440.0">
+                           <children>
+                              <Label text="Opponents Name" />
+                               <GridPane fx:id="board" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" VBox.vgrow="ALWAYS" />
+                              <Label text="Your Name" />
+                           </children>
+                        </VBox>
+                        <VBox prefHeight="470.0" prefWidth="100.0">
+                           <children>
+                              <Label text="Users:" />
+                              <Label text="Online:" />
+                              <ListView prefHeight="200.0" prefWidth="200.0" />
+                              <Label text="Offline:" />
+                              <ListView prefHeight="200.0" prefWidth="200.0" />
+                           </children></VBox>
+                     </children>
+                  </HBox>
+                  <HBox prefHeight="100.0" prefWidth="200.0">
+                     <children>
+                        <Button mnemonicParsing="false" text="Send" />
+                        <TextField />
+                        <Button mnemonicParsing="false" text="Add Friend">
+                           <HBox.margin>
+                              <Insets left="300.0" />
+                           </HBox.margin></Button>
+                        <TextField />
+                     </children>
+                  </HBox>
+               </children>
+            </VBox>
+         </center>
+      </BorderPane>
+   </children>
+</AnchorPane>

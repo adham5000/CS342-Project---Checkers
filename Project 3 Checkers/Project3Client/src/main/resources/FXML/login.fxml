@@ -3,7 +3,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="CheckersAPI">
+<AnchorPane prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="CheckersAPI">
    <children>
       <BorderPane layoutY="-1.0" prefHeight="400.0" prefWidth="600.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
          <center>
@@ -28,12 +28,12 @@
                      </children>
                   </VBox>
                   <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
-                      <RadioButton mnemonicParsing="false" text="Singleplayer" selected="true">
+                      <RadioButton mnemonicParsing="false" selected="true" text="Singleplayer">
                             <toggleGroup>
                                 <ToggleGroup fx:id="gameType" />
                             </toggleGroup>/>
                         </RadioButton>
-                        <RadioButton mnemonicParsing="false" text="Multiplayer" toggleGroup="$gameType"/>
+                        <RadioButton mnemonicParsing="false" text="Multiplayer" toggleGroup="$gameType" />
                   </HBox>
                   <Button alignment="CENTER" mnemonicParsing="false" text="Play Game" />
                </children>
