@@ -44,11 +44,11 @@ public class CheckersAPI {
         for(int r = 0; r < 8;++r){
             for(int c = 0; c < 8;++c){
                 Checkersquare square;
-                if((r == 0 && c % 2 == 1) || (r == 1 && c % 2 == 0) || (r == 2 && c % 2 == 1)){
-                    square = new Checkersquare(r,c, Checkersquare.Piece.WHITE);
-                }
-                else if ((r == 6 && c % 2 == 1) || (r == 7 && c % 2 == 0) || (r == 5 && c % 2 == 0)) {
+                if((r == 0 && c % 2 == 0) || (r == 1 && c % 2 == 1) || (r == 2 && c % 2 == 0)){
                     square = new Checkersquare(r,c, Checkersquare.Piece.RED);
+                }
+                else if ((r == 6 && c % 2 == 0) || (r == 7 && c % 2 == 1) || (r == 5 && c % 2 == 1)) {
+                    square = new Checkersquare(r,c, Checkersquare.Piece.WHITE);
                 }
                 else {
                     square = new Checkersquare(r, c, Checkersquare.Piece.EMPTY);
@@ -56,7 +56,7 @@ public class CheckersAPI {
                 square.setPrefSize(80,80);
                 square.getStyleClass().add("square");
                 square.setOnAction(event -> handleSquareClick(square));
-                board.add(square,c,r);
+                board.add(square, c,7-r);
                 squares[r][c] = square;
             }
         }
@@ -83,11 +83,11 @@ public class CheckersAPI {
                 myColor = "WHITE";
                 for(int r = 0; r < 8;++r){
                     for(int c = 0; c < 8;++c){
-                        if((r == 0 && c % 2 == 1) || (r == 1 && c % 2 == 0) || (r == 2 && c % 2 == 1)){
-                            squares[r][c].setPiece(Checkersquare.Piece.RED);
-                        }
-                        else if ((r == 6 && c % 2 == 1) || (r == 7 && c % 2 == 0) || (r == 5 && c % 2 == 0)) {
+                        if((r == 0 && c % 2 == 0) || (r == 1 && c % 2 == 1) || (r == 2 && c % 2 == 0)){
                             squares[r][c].setPiece(Checkersquare.Piece.WHITE);
+                        }
+                        else if ((r == 6 && c % 2 == 0) || (r == 7 && c % 2 == 1) || (r == 5 && c % 2 == 1)) {
+                            squares[r][c].setPiece(Checkersquare.Piece.RED);
                         }
                     }
                 }
@@ -98,21 +98,53 @@ public class CheckersAPI {
             int fromCol;
             int toRow;
             int toCol;
+            int kingRow = -1;
+            int kingCol = -1;
+            int capturedRow = -1;
+            int capturedCol = -1;
             if(myColor.equals("RED")){
                 fromRow = msg.getFromRow();
                 fromCol = msg.getFromCol();
                 toRow = msg.getToRow();
                 toCol = msg.getToCol();
+                if(msg.getKingCol() != -1) {
+                    kingRow = msg.getKingRow();
+                    kingCol = msg.getKingCol();
+                }
+                if(msg.getCapturedCol() != -1) {
+                    capturedRow = msg.getCapturedRow();
+                    capturedCol = msg.getCapturedCol();
+                }
             }
             else{
                 fromRow = 7 - msg.getFromRow();
                 fromCol = 7 - msg.getFromCol();
                 toRow = 7 - msg.getToRow();
                 toCol = 7 - msg.getToCol();
+                if(msg.getKingCol() != -1) {
+                    kingRow = 7 - msg.getKingRow();
+                    kingCol = 7 - msg.getKingCol();
+                }
+                if(msg.getCapturedCol() != -1) {
+                    capturedRow = 7 - msg.getCapturedRow();
+                    capturedCol = 7 - msg.getCapturedCol();
+                }
             }
             Checkersquare.Piece piece = squares[fromRow][fromCol].getPiece();
             squares[fromRow][fromCol].setPiece(Checkersquare.Piece.EMPTY);
             squares[toRow][toCol].setPiece(piece);
+
+            if(capturedCol != -1){
+                squares[capturedRow][capturedCol].setPiece(Checkersquare.Piece.EMPTY);
+            }
+            if(kingCol != -1){
+                if(squares[kingRow][kingCol].getPiece() == Checkersquare.Piece.WHITE){
+                    squares[kingRow][kingCol].setPiece(Checkersquare.Piece.WHITE_KING);
+                }
+                else{
+                    squares[kingRow][kingCol].setPiece(Checkersquare.Piece.RED_KING);
+                }
+            }
 
         }
         else {
@@ -149,6 +181,7 @@ public class CheckersAPI {
     }
     @FXML
     private void handleSquareClick(Checkersquare square) {
+
         if(selectedSquare == null){
             if(square.getPiece() == Checkersquare.Piece.EMPTY){
                 return;
@@ -160,11 +193,16 @@ public class CheckersAPI {
 
         Checkersquare from =  selectedSquare;
         Checkersquare to =  square;
+        Message message;
 
         from.getStyleClass().remove("selected-square");
         selectedSquare = null;
-
-        Message message = new Message(from.getRow(),from.getCol(),to.getRow(),to.getCol(),Message.messageType.CHECKERMOVE);
+        if(myColor.equals("RED")) {
+            message = new Message(from.getRow(), from.getCol(), to.getRow(), to.getCol(), Message.messageType.CHECKERMOVE);
+        }
+        else{
+            message = new Message(7 - from.getRow(),7 - from.getCol(),7 - to.getRow(),7 - to.getCol(), Message.messageType.CHECKERMOVE);
+        }
         client.send(message);
     }
 

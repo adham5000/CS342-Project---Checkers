@@ -22,7 +22,7 @@ public class Checkersquare extends Button {
 
 
         setFont(Font.font(32));
-        if((row + col) % 2 == 1) {
+        if((row + col) % 2 == 0) {
             setStyle("-fx-background-color: BLACK;");
         }
         else{

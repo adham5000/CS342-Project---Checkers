@@ -151,15 +151,21 @@ public class Server {
 						addToQueue(this);
 					}
 					else if(data.msgType() == Message.messageType.CHECKERMOVE && game!=null && game.getTurn() == playerColor){
-						//boolean validMove = evaluate()
-						msg = new Message(data.getFromRow(),data.getFromCol(),data.getToRow(),data.getToCol(), Message.messageType.CHECKERMOVE);
-						game.getOpponent(this).out.writeObject(msg);
-						out.writeObject(msg);
-						if(game.getTurn() == 1){
-							game.setTurn(2);
+
+						msg = game.evaluate(data.getFromRow(), data.getFromCol(), data.getToRow(), data.getToCol());
+						if(msg.msgType() == Message.messageType.GLOBAL){
+							out.writeObject(msg);
 						}
-						else{
-							game.setTurn(1);
+						else {
+							game.getOpponent(this).out.writeObject(msg);
+							out.writeObject(msg);
+							if(!game.canMoveAgain) {
+								if (game.getTurn() == 1) {
+									game.setTurn(2);
+								} else {
+									game.setTurn(1);
+								}
+							}
 						}
 					}
 					else {
@@ -209,7 +215,7 @@ public class Server {
 		Message msg = new Message("RED",Message.messageType.GAME_START);
 		try {
 			p1.out.writeObject(msg);
-			msg = new Message("BLACK", Message.messageType.GAME_START);
+			msg = new Message("WHITE", Message.messageType.GAME_START);
 			p2.out.writeObject(msg);
 		}
 		catch(Exception e) {
@@ -225,6 +231,7 @@ public class Server {
 		private ClientThread blackPlayer;
 		private int[][] board = new int[8][8];
 		private int turn;
+		public boolean canMoveAgain;
 
 		public GameSession(ClientThread r, ClientThread b) {
 			this.redPlayer = r;
@@ -232,6 +239,7 @@ public class Server {
 			this.blackPlayer = b;
 			this.blackPlayer.playerColor = 2;
 			this.turn = 1;
+			this.canMoveAgain = false;
 			initializeBoard();
 		}
 
@@ -241,11 +249,11 @@ public class Server {
 		private void initializeBoard() {
 			for (int r = 0; r < 8; r++) {
 				for (int c = 0; c < 8; c++) {
-					if((r == 0 && c % 2 == 1) || (r == 1 && c % 2 == 0) || (r == 2 && c % 2 == 1)){
-						board[r][c] = 2;
-					}
-					else if ((r == 6 && c % 2 == 1) || (r == 7 && c % 2 == 0) || (r == 5 && c % 2 == 0)) {
+					if((r == 0 && c % 2 == 0) || (r == 1 && c % 2 == 1) || (r == 2 && c % 2 == 0)){
 						board[r][c] = 1;
+					}
+					else if ((r == 6 && c % 2 == 0) || (r == 7 && c % 2 == 1) || (r == 5 && c % 2 == 1)) {
+						board[r][c] = 2;
 					}
 					else {
 						board[r][c] = 0;
@@ -262,19 +270,226 @@ public class Server {
 
 		public Message evaluate(int fromRow, int fromCol, int toRow, int toCol) {
 			Message msg;
+			int capturedRow = -1;
+			int capturedCol = -1;
+			int kingRow = -1;
+			int kingCol = -1;
+
 			if(toRow == fromRow && toCol == fromCol) {
-				msg = new Message("INVALID MOVE");
+				msg = new Message("YOU CANNOT MOVE TO THE SAME SPOT");
 				return msg;
 			}
 
-			if((toRow % 2 == 0 && toCol % 2 == 1) || (toRow % 2 == 1 &&  toCol % 2 == 0)) {
-				msg = new Message("CAN'T MOVE TO A WHITE SQUARE");
+			if((toRow + toCol) % 2 == 1) {
+				msg = new Message("YOU CANNOT MOVE TO A WHITE SQUARE");
+				return msg;
+			}
+
+			if(turn == 1 && (board[fromRow][fromCol] == 2 || board[fromRow][fromCol] == 4)) {
+				msg = new Message("YOU CANNOT MOVE WHITE PIECES");
+				return msg;
+			}
+
+			if(turn == 2 && (board[fromRow][fromCol] == 1 || board[fromRow][fromCol] == 3)) {
+				msg = new Message("YOU CANNOT MOVE RED PIECES");
+				return msg;
+			}
+
+			if(board[toRow][toCol] != 0){
+				msg = new Message("YOU CANNOT LAND ON ANOTHER PIECE");
+				return msg;
+			}
+
+			boolean isSimpleMove = false;
+			boolean isJump = false;
+			int rowDif =  toRow - fromRow;
+			int colDif = toCol - fromCol;
+
+			if(colDif == 0 || rowDif == 0) {
+				msg = new Message("PIECES CANNOT MOVE IN STRAIGHT DIRECTIONS");
+				return msg;
+			}
+
+			if(Math.abs(rowDif) == 1 && Math.abs(colDif) == 1) {
+				isSimpleMove = true;
+			}
+			else{
+				isJump = true;
+			}
+
+			if(isSimpleMove && ((toRow <= fromRow && board[fromRow][fromCol] == 1) || (toRow >= fromRow && board[fromRow][fromCol] == 2))) {
+				msg = new Message("REGULAR PIECES CAN MOVE ONLY DIAGONALLY FORWARD");
+				return msg;
+			}
+
+			if(playerMustJump(turn) && isSimpleMove){
+				msg = new Message("YOU MUST JUMP IF YOU CAN");
+				return msg;
+			}
+
+			if(isSimpleMove){
+				board[toRow][toCol] = board[fromRow][fromCol];
+				board[fromRow][fromCol] = 0;
+				if((toRow == 7 && turn == 1)){
+					kingRow = toRow;
+					kingCol = toCol;
+					board[kingRow][kingCol] = 3;
+				}
+				if(toRow == 0 && turn == 2){
+					kingRow = toRow;
+					kingCol = toCol;
+					board[kingRow][kingCol] = 4;
+				}
+				msg = new Message(fromRow,fromCol,toRow,toCol,-1,-1,kingRow,kingCol, Message.messageType.CHECKERMOVE);
+				return msg;
+			}
+			else {
+				int jumpedRow = (fromRow + toRow) / 2;
+				int jumpedCol = (fromCol + toCol) / 2;
+
+				int jumpedPiece = board[jumpedRow][jumpedCol];
+				if((turn == 1 && jumpedPiece == 1) || (turn == 2 && jumpedPiece == 2)){
+					msg = new Message("YOU CANNOT CAPTURE YOUR OWN PIECES");
+					return msg;
+				}
+				board[toRow][toCol] = board[fromRow][fromCol];
+				board[fromRow][fromCol] = 0;
+
+				board[jumpedRow][jumpedCol] = 0;
+				capturedRow = jumpedRow;
+				capturedCol = jumpedCol;
+
+				if((toRow == 7 && turn == 1)){
+					kingRow = toRow;
+					kingCol = toCol;
+					board[kingRow][kingCol] = 3;
+				}
+				if(toRow == 0 && turn == 2){
+					kingRow = toRow;
+					kingCol = toCol;
+					board[kingRow][kingCol] = 4;
+				}
+				canMoveAgain = canJumpAgain(toRow, toCol);
+				msg = new Message(fromRow,fromCol,toRow,toCol,capturedRow,capturedCol,kingRow,kingCol, Message.messageType.CHECKERMOVE);
 				return msg;
 			}
 
 
 		}
-
+		public boolean canJumpAgain(int row, int col) {
+			if(board[row][col] == 1 ||  board[row][col] == 3){
+				if(row + 2 < 8 && col + 2 < 8 && board[row + 2][col + 2] == 0) {
+					if(board[row + 1][col + 1] == 2 || board[row + 1][col + 1] == 4){
+						return true;
+					}
+				}
+				if(row + 2 < 8 && col - 2 >= 0 && board[row + 2][col - 2] == 0) {
+					if(board[row + 1][col - 1] == 2 || board[row + 1][col - 1] == 4){
+						return true;
+					}
+				}
+			}
+			if(board[row][col] == 3){
+				if(row - 2 >= 0 && col - 2 >= 0 && board[row - 2][col - 2] == 0) {
+					if(board[row - 1][col - 1] == 2 || board[row - 1][col - 1] == 4){
+						return true;
+					}
+				}
+				if(row - 2 >= 0 && col + 2 < 8 && board[row - 2][col + 2] == 0) {
+					if(board[row - 1][col + 1] == 2 || board[row - 1][col + 1] == 4){
+						return true;
+					}
+				}
+			}
+			if(board[row][col] == 2 || board[row][col] == 4){
+				if(row + 2 < 8 && col + 2 < 8 && board[row + 2][col + 2] == 0) {
+					if(board[row + 1][col + 1] == 1 || board[row + 1][col + 1] == 3){
+						return true;
+					}
+				}
+				if(row + 2 < 8 && col - 2 >= 0 && board[row + 2][col - 2] == 0) {
+					if(board[row + 1][col - 1] == 1 || board[row + 1][col - 1] == 3){
+						return true;
+					}
+				}
+			}
+			if(board[row][col] == 4){
+				if(row - 2 >= 0 && col - 2 >= 0 && board[row - 2][col - 2] == 0) {
+					if(board[row - 1][col - 1] == 1 || board[row - 1][col - 1] == 3){
+						return true;
+					}
+				}
+				if(row - 2 >= 0 && col + 2 < 8 && board[row - 2][col + 2] == 0) {
+					if(board[row - 1][col + 1] == 1 || board[row - 1][col + 1] == 3){
+						return true;
+					}
+				}
+			}
+			return false;
+		}
+		public boolean playerMustJump(int turn) {
+			if(turn == 1){
+				for(int r = 0; r < 8; r++) {
+					for(int c = 0; c < 8; c++) {
+						if(board[r][c] == 1 || board[r][c] == 3){
+							if(r + 2 < 8 && c + 2 < 8 && board[r + 2][c + 2] == 0) {
+								if(board[r + 1][c + 1] == 2 || board[r + 1][c + 1] == 4){
+									return true;
+								}
+							}
+							if(r + 2 < 8 && c - 2 >= 0 && board[r + 2][c - 2] == 0) {
+								if(board[r + 1][c - 1] == 2 || board[r + 1][c - 1] == 4){
+									return true;
+								}
+							}
+						}
+						if(board[r][c] == 3){
+							if(r - 2 >= 0 && c - 2 >= 0 && board[r - 2][c - 2] == 0) {
+								if(board[r - 1][c - 1] == 2 || board[r - 1][c - 1] == 4){
+									return true;
+								}
+							}
+							if(r - 2 >= 0 && c + 2 < 8 && board[r - 2][c + 2] == 0) {
+								if(board[r - 1][c + 1] == 2 || board[r - 1][c + 1] == 4){
+									return true;
+								}
+							}
+						}
+					}
+				}
+			}
+			else{
+				for(int r = 0; r < 8; r++) {
+					for(int c = 0; c < 8; c++) {
+						if(board[r][c] == 2 || board[r][c] == 4){
+							if(r + 2 < 8 && c + 2 < 8 && board[r + 2][c + 2] == 0) {
+								if(board[r + 1][c + 1] == 1 || board[r + 1][c + 1] == 3){
+									return true;
+								}
+							}
+							if(r + 2 < 8 && c - 2 >= 0 && board[r + 2][c - 2] == 0) {
+								if(board[r + 1][c - 1] == 1 || board[r + 1][c - 1] == 3){
+									return true;
+								}
+							}
+						}
+						if(board[r][c] == 4){
+							if(r - 2 >= 0 && c - 2 >= 0 && board[r - 2][c - 2] == 0) {
+								if(board[r - 1][c - 1] == 1 || board[r - 1][c - 1] == 3){
+									return true;
+								}
+							}
+							if(r - 2 >= 0 && c + 2 < 8 && board[r - 2][c + 2] == 0) {
+								if(board[r - 1][c + 1] == 1 || board[r - 1][c + 1] == 3){
+									return true;
+								}
+							}
+						}
+					}
+				}
+			}
+			return false;
+		}
 	}
 
 }
