@@ -153,12 +153,12 @@ public class Server {
 					}
 					else if(data.msgType() == Message.messageType.CHECKERMOVE && game!=null){
 						if(game.getTurn() != playerColor){
-							msg = new Message("IT IS NOT YOUR TURN");
+							msg = new Message("IT IS NOT YOUR TURN",Message.messageType.CHECKERMOVE);
 							out.writeObject(msg);
 						}
 						else {
 							msg = game.evaluate(data.getFromRow(), data.getFromCol(), data.getToRow(), data.getToCol());
-							if (msg.msgType() == Message.messageType.GLOBAL) {
+							if (msg.returnMessage() != null) {
 								out.writeObject(msg);
 							} else {
 								if(game.whiteLost()){
@@ -189,9 +189,9 @@ public class Server {
 							}
 						}
 					}
-					else {
-						msg = new Message("client: " + count + " user: " + userNames.get(count) + ": " + data.returnMessage());
-						updateClients(msg);
+					else if(data.msgType() == Message.messageType.GLOBAL && game!=null){
+						msg = new Message("user: " + userNames.get(count) + ": " + data.returnMessage());
+						game.getOpponent(this).out.writeObject(msg);
 						callback.accept(msg);
 					}
 				}
@@ -204,7 +204,7 @@ public class Server {
 
 					userNames.remove(count);
 					clients.remove(this);
-
+					waitList.remove(this);
 					ArrayList<String> tempList = new ArrayList<>(userNames.values());
 					msg = new Message(tempList, Message.messageType.USERLOG);
 					callback.accept(msg);
@@ -232,11 +232,13 @@ public class Server {
 
 		p1.setSession(session);
 		p2.setSession(session);
-
-		Message msg = new Message("RED",Message.messageType.GAME_START);
+		ArrayList<String> names = new ArrayList<>();
+		names.add(userNames.get(p1.count));
+		names.add(userNames.get(p2.count));
+		Message msg = new Message("RED",Message.messageType.GAME_START, names);
 		try {
 			p1.out.writeObject(msg);
-			msg = new Message("WHITE", Message.messageType.GAME_START);
+			msg = new Message("WHITE", Message.messageType.GAME_START, names);
 			p2.out.writeObject(msg);
 		}
 		catch(Exception e) {
@@ -299,27 +301,27 @@ public class Server {
 			int kingCol = -1;
 			int piece;
 			if(toRow == fromRow && toCol == fromCol) {
-				msg = new Message("YOU CANNOT MOVE TO THE SAME SPOT");
+				msg = new Message("YOU CANNOT MOVE TO THE SAME SPOT", Message.messageType.CHECKERMOVE);
 				return msg;
 			}
 
 			if((toRow + toCol) % 2 == 1) {
-				msg = new Message("YOU CANNOT MOVE TO A WHITE SQUARE");
+				msg = new Message("YOU CANNOT MOVE TO A WHITE SQUARE", Message.messageType.CHECKERMOVE);
 				return msg;
 			}
 
 			if(turn == 1 && (board[fromRow][fromCol] == 2 || board[fromRow][fromCol] == 4)) {
-				msg = new Message("YOU CANNOT MOVE WHITE PIECES");
+				msg = new Message("YOU CANNOT MOVE WHITE PIECES", Message.messageType.CHECKERMOVE);
 				return msg;
 			}
 
 			if(turn == 2 && (board[fromRow][fromCol] == 1 || board[fromRow][fromCol] == 3)) {
-				msg = new Message("YOU CANNOT MOVE RED PIECES");
+				msg = new Message("YOU CANNOT MOVE RED PIECES", Message.messageType.CHECKERMOVE);
 				return msg;
 			}
 
 			if(board[toRow][toCol] != 0){
-				msg = new Message("YOU CANNOT LAND ON ANOTHER PIECE");
+				msg = new Message("YOU CANNOT LAND ON ANOTHER PIECE", Message.messageType.CHECKERMOVE);
 				return msg;
 			}
 
@@ -329,7 +331,7 @@ public class Server {
 			int colDif = toCol - fromCol;
 
 			if(colDif == 0 || rowDif == 0) {
-				msg = new Message("PIECES CANNOT MOVE IN STRAIGHT DIRECTIONS");
+				msg = new Message("PIECES CANNOT MOVE IN STRAIGHT DIRECTIONS", Message.messageType.CHECKERMOVE);
 				return msg;
 			}
 
@@ -341,32 +343,32 @@ public class Server {
 			}
 
 			if(isSimpleMove && ((toRow <= fromRow && board[fromRow][fromCol] == 1) || (toRow >= fromRow && board[fromRow][fromCol] == 2))) {
-				msg = new Message("REGULAR PIECES CAN MOVE ONLY DIAGONALLY FORWARD");
+				msg = new Message("REGULAR PIECES CAN MOVE ONLY DIAGONALLY FORWARD", Message.messageType.CHECKERMOVE);
 				return msg;
 			}
 
 			if(playerMustJump(turn) && isSimpleMove){
-				msg = new Message("YOU MUST JUMP IF YOU CAN");
+				msg = new Message("YOU MUST JUMP IF YOU CAN", Message.messageType.CHECKERMOVE);
 				return msg;
 			}
 			if(isSimpleMove && (turn == 1) && (rowDif != 1) && (board[fromRow][fromCol] == 1)){
-				msg = new Message("YOU CAN ONLY MOVE CHECKERS FORWARD");
+				msg = new Message("YOU CAN ONLY MOVE CHECKERS FORWARD", Message.messageType.CHECKERMOVE);
 				return msg;
 			}
 			if(isSimpleMove && (turn == 2) && (rowDif != -1) && (board[fromRow][fromCol] == 2)){
-				msg = new Message("YOU CAN ONLY MOVE CHECKERS FORWARD");
+				msg = new Message("YOU CAN ONLY MOVE CHECKERS FORWARD", Message.messageType.CHECKERMOVE);
 				return msg;
 			}
 			if(isJump && !(Math.abs(rowDif) == 2 && Math.abs(colDif) == 2)) {
-				msg = new Message("YOU CAN ONLY JUMP DIAGONALLY ABOVE ONE ENEMY CHECKER");
+				msg = new Message("YOU CAN ONLY JUMP DIAGONALLY ABOVE ONE ENEMY CHECKER", Message.messageType.CHECKERMOVE);
 				return msg;
 			}
 			if(isJump && (turn == 1) && (board[fromRow][fromCol] == 1) &&(rowDif != 2)){
-				msg = new Message("YOU CAN ONLY JUMP CHECKERS FORWARD");
+				msg = new Message("YOU CAN ONLY JUMP CHECKERS FORWARD", Message.messageType.CHECKERMOVE);
 				return msg;
 			}
 			if(isJump && (turn == 2) && (board[fromRow][fromCol] == 2) &&(rowDif != -2)){
-				msg = new Message("YOU CAN ONLY JUMP CHECKERS FORWARD");
+				msg = new Message("YOU CAN ONLY JUMP CHECKERS FORWARD",Message.messageType.CHECKERMOVE);
 				return msg;
 			}
 			if(isSimpleMove){
@@ -393,11 +395,11 @@ public class Server {
 
 				int jumpedPiece = board[jumpedRow][jumpedCol];
 				if((turn == 1 && ((jumpedPiece == 1) || (jumpedPiece == 3))) || (turn == 2 && ((jumpedPiece == 2) || (jumpedPiece == 4)))) {
-					msg = new Message("YOU CANNOT CAPTURE YOUR OWN PIECES");
+					msg = new Message("YOU CANNOT CAPTURE YOUR OWN PIECES",Message.messageType.CHECKERMOVE);
 					return msg;
 				}
 				if(jumpedPiece == 0) {
-					msg = new Message("YOU CANNOT JUMP AN EMPTY SQUARE");
+					msg = new Message("YOU CANNOT JUMP AN EMPTY SQUARE",Message.messageType.CHECKERMOVE);
 					return msg;
 				}
 				piece = board[fromRow][fromCol];

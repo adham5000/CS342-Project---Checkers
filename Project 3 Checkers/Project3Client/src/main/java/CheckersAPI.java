@@ -18,6 +18,7 @@ public class CheckersAPI {
     @FXML private GridPane board;
     @FXML private ListView<String> chatList;
     @FXML private ListView<String> listUsers;
+    @FXML private ListView<String> listMoves;
     @FXML private TextField chatInput;
     @FXML private TextField nameField;
     @FXML private TextField userfield;
@@ -26,7 +27,9 @@ public class CheckersAPI {
     @FXML private Button rematchBtn;
     @FXML private Button sendBtn;
     @FXML private Label player1Name;
+    @FXML private Label player2Name;
     @FXML private Label erroruser;
+    @FXML private TextField sendField;
 
     private Stage stage;
 
@@ -71,6 +74,7 @@ public class CheckersAPI {
                 squares[r][c] = square;
             }
         }
+        player1Name.setText(myName);
     }
 
     public void handleServerMessage(Object data) {
@@ -113,12 +117,33 @@ public class CheckersAPI {
             startGameBtn.setDisable(true);
             if(Objects.equals(msg.returnMessage(), "RED")){
                 myColor = "RED";
+                player2Name.setText(msg.getActiveUsers().get(1));
+                for(int r = 0; r < 8;++r){
+                    for(int c = 0; c < 8;++c){
+                        if((r + c) % 2 == 0){
+                            int n = squares[r][c].toNotationNumber(r,c);
+                            squares[r][c].setNumber(n);
+                        }
+                        if((r == 0 && c % 2 == 0) || (r == 1 && c % 2 == 1) || (r == 2 && c % 2 == 0)){
+                            squares[r][c].setPiece(Checkersquare.Piece.RED);
+                        }
+                        else if ((r == 6 && c % 2 == 0) || (r == 7 && c % 2 == 1) || (r == 5 && c % 2 == 1)) {
+                            squares[r][c].setPiece(Checkersquare.Piece.WHITE);
+                        }
+                    }
+                }
                 return;
             }
             else{
                 myColor = "WHITE";
+                player2Name.setText(msg.getActiveUsers().get(0));
                 for(int r = 0; r < 8;++r){
                     for(int c = 0; c < 8;++c){
+                        if((r + c) % 2 == 0){
+                            int n = squares[r][c].toNotationNumber(r,c);
+                            n = 33 - n;
+                            squares[r][c].setNumber(n);
+                        }
                         if((r == 0 && c % 2 == 0) || (r == 1 && c % 2 == 1) || (r == 2 && c % 2 == 0)){
                             squares[r][c].setPiece(Checkersquare.Piece.WHITE);
                         }
@@ -130,58 +155,64 @@ public class CheckersAPI {
             }
         }
         else if(msg.msgType() == Message.messageType.CHECKERMOVE){
-            int fromRow;
-            int fromCol;
-            int toRow;
-            int toCol;
-            int kingRow = -1;
-            int kingCol = -1;
-            int capturedRow = -1;
-            int capturedCol = -1;
-            if(myColor.equals("RED")){
-                fromRow = msg.getFromRow();
-                fromCol = msg.getFromCol();
-                toRow = msg.getToRow();
-                toCol = msg.getToCol();
-                if(msg.getKingCol() != -1) {
-                    kingRow = msg.getKingRow();
-                    kingCol = msg.getKingCol();
-                }
-                if(msg.getCapturedCol() != -1) {
-                    capturedRow = msg.getCapturedRow();
-                    capturedCol = msg.getCapturedCol();
-                }
+            if(msg.returnMessage() != null){
+                listMoves.getItems().add(msg.returnMessage());
             }
-            else{
-                fromRow = 7 - msg.getFromRow();
-                fromCol = 7 - msg.getFromCol();
-                toRow = 7 - msg.getToRow();
-                toCol = 7 - msg.getToCol();
-                if(msg.getKingCol() != -1) {
-                    kingRow = 7 - msg.getKingRow();
-                    kingCol = 7 - msg.getKingCol();
+            else {
+                int fromRow;
+                int fromCol;
+                int toRow;
+                int toCol;
+                int kingRow = -1;
+                int kingCol = -1;
+                int capturedRow = -1;
+                int capturedCol = -1;
+                if (myColor.equals("RED")) {
+                    fromRow = msg.getFromRow();
+                    fromCol = msg.getFromCol();
+                    toRow = msg.getToRow();
+                    toCol = msg.getToCol();
+                    if (msg.getKingCol() != -1) {
+                        kingRow = msg.getKingRow();
+                        kingCol = msg.getKingCol();
+                    }
+                    if (msg.getCapturedCol() != -1) {
+                        capturedRow = msg.getCapturedRow();
+                        capturedCol = msg.getCapturedCol();
+                    }
+                } else {
+                    fromRow = 7 - msg.getFromRow();
+                    fromCol = 7 - msg.getFromCol();
+                    toRow = 7 - msg.getToRow();
+                    toCol = 7 - msg.getToCol();
+                    if (msg.getKingCol() != -1) {
+                        kingRow = 7 - msg.getKingRow();
+                        kingCol = 7 - msg.getKingCol();
+                    }
+                    if (msg.getCapturedCol() != -1) {
+                        capturedRow = 7 - msg.getCapturedRow();
+                        capturedCol = 7 - msg.getCapturedCol();
+                    }
                 }
-                if(msg.getCapturedCol() != -1) {
-                    capturedRow = 7 - msg.getCapturedRow();
-                    capturedCol = 7 - msg.getCapturedCol();
-                }
-            }
-            Checkersquare.Piece piece = squares[fromRow][fromCol].getPiece();
-            squares[fromRow][fromCol].setPiece(Checkersquare.Piece.EMPTY);
-            squares[toRow][toCol].setPiece(piece);
+                Checkersquare.Piece piece = squares[fromRow][fromCol].getPiece();
+                squares[fromRow][fromCol].setPiece(Checkersquare.Piece.EMPTY);
+                squares[toRow][toCol].setPiece(piece);
 
-            if(capturedCol != -1){
-                squares[capturedRow][capturedCol].setPiece(Checkersquare.Piece.EMPTY);
-            }
-            if(kingCol != -1){
-                if(squares[kingRow][kingCol].getPiece() == Checkersquare.Piece.WHITE){
-                    squares[kingRow][kingCol].setPiece(Checkersquare.Piece.WHITE_KING);
+                if (capturedCol != -1) {
+                    listMoves.getItems().add(squares[fromRow][fromCol].getSquareNumber() + "x" + squares[toRow][toCol].getSquareNumber());
+                    squares[capturedRow][capturedCol].setPiece(Checkersquare.Piece.EMPTY);
                 }
                 else{
-                    squares[kingRow][kingCol].setPiece(Checkersquare.Piece.RED_KING);
+                    listMoves.getItems().add(squares[fromRow][fromCol].getSquareNumber() + "-" + squares[toRow][toCol].getSquareNumber());
+                }
+                if (kingCol != -1) {
+                    if (squares[kingRow][kingCol].getPiece() == Checkersquare.Piece.WHITE) {
+                        squares[kingRow][kingCol].setPiece(Checkersquare.Piece.WHITE_KING);
+                    } else {
+                        squares[kingRow][kingCol].setPiece(Checkersquare.Piece.RED_KING);
+                    }
                 }
             }
-
         }
         else {
             chatList.getItems().add(msg.returnMessage());
@@ -190,18 +221,24 @@ public class CheckersAPI {
     }
     @FXML
     private void sendButtonHandler(ActionEvent event) {
-        if (nameField.getText().isEmpty()) {
-            Message message = new Message(chatInput.getText(), Message.messageType.GLOBAL);
+//        if (nameField.getText().isEmpty()) {
+//            Message message = new Message(chatInput.getText(), Message.messageType.GLOBAL);
+//            client.send(message);
+//            chatInput.clear();
+//        }
+//        else {
+//            String[] items = nameField.getText().split(",");
+//            ArrayList<String> temp = new ArrayList<>(Arrays.asList(items));
+//            temp.add(myName);
+//            Message message = new Message(chatInput.getText(), Message.messageType.GROUP, temp);
+//            client.send(message);
+//            chatInput.clear();
+//        }
+        if(!sendField.getText().isEmpty() && !Objects.equals(myColor, "")){
+            Message message = new Message(sendField.getText(), Message.messageType.GLOBAL);
             client.send(message);
-            chatInput.clear();
-        }
-        else {
-            String[] items = nameField.getText().split(",");
-            ArrayList<String> temp = new ArrayList<>(Arrays.asList(items));
-            temp.add(myName);
-            Message message = new Message(chatInput.getText(), Message.messageType.GROUP, temp);
-            client.send(message);
-            chatInput.clear();
+            chatList.getItems().add("You said: " + sendField.getText());
+            sendField.clear();
         }
     }
     @FXML
@@ -248,12 +285,15 @@ public class CheckersAPI {
         Message message = new Message(userfield.getText(), Message.messageType.USERNAME);
         client.send(message);
         userfield.clear();
-        if(myName != null) {
-
-            player1Name.setText(myName);
-            message = new Message(Message.messageType.GAME_START);
-            client.send(message);
-        }
+//        if(myName != null) {
+//
+//            player1Name.setText(myName);
+//            message = new Message(Message.messageType.GAME_START);
+//            client.send(message);
+//        }
     }
-
+    @FXML void handleRandomGame(ActionEvent event) {
+        Message message = new Message(Message.messageType.GAME_START);
+        client.send(message);
+    }
 }

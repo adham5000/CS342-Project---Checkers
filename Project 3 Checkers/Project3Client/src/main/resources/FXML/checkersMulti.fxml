@@ -14,22 +14,27 @@
                      <children>
                         <VBox prefHeight="470.0" prefWidth="100.0">
                            <children>
+                              <Label text="Moves:" />
+                              <ListView fx:id="listMoves" prefHeight="201.0" prefWidth="100.0" />
                               <Label text="Chat:" />
-                              <ListView fx:id = "chatList" prefHeight="452.0" prefWidth="100.0" />
+                              <ListView fx:id = "chatList" prefHeight="200.0" prefWidth="200.0" />
                            </children>
                         </VBox>
                         <VBox prefHeight="470.0" prefWidth="440.0">
                            <children>
-                              <Label text="Opponents Name" />
+                              <Label fx:id="player2Name" text="Opponents Name" />
                                <GridPane fx:id="board" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" VBox.vgrow="ALWAYS" />
-                              <Label text="Your Name" />
+                              <Label fx:id="player1Name" text="Your Name">
+                                 <VBox.margin>
+                                    <Insets />
+                                 </VBox.margin></Label>
                            </children>
                         </VBox>
                         <VBox prefHeight="470.0" prefWidth="100.0">
                            <children>
                               <Label text="Users:" />
                               <Label text="Online:" />
-                              <ListView fx:id = "listUsers" prefHeight="200.0" prefWidth="200.0" />
+                              <ListView fx:id="listUsers" prefHeight="200.0" prefWidth="200.0" />
                               <Label text="Offline:" />
                               <ListView prefHeight="200.0" prefWidth="200.0" />
                            </children></VBox>
@@ -37,8 +42,9 @@
                   </HBox>
                   <HBox prefHeight="100.0" prefWidth="200.0">
                      <children>
-                        <Button mnemonicParsing="false" text="Send" />
-                        <TextField />
+                        <Button mnemonicParsing="false" text="Send" onAction="#sendButtonHandler"/>
+                        <TextField fx:id = "sendField"/>
+                        <Button fx:id="startGameBtn" mnemonicParsing="false" onAction="#handleRandomGame" text="start random game" />
                         <Button mnemonicParsing="false" text="Add Friend">
                            <HBox.margin>
                               <Insets left="300.0" />
