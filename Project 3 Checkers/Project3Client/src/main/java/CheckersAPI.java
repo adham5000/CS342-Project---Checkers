@@ -1,8 +1,14 @@
+import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 
 import javafx.event.ActionEvent;
+import javafx.stage.Stage;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Objects;
@@ -14,31 +20,38 @@ public class CheckersAPI {
     @FXML private ListView<String> listUsers;
     @FXML private TextField chatInput;
     @FXML private TextField nameField;
+    @FXML private TextField userfield;
     @FXML private Button setUserName;
     @FXML private Button startGameBtn;
     @FXML private Button rematchBtn;
     @FXML private Button sendBtn;
     @FXML private Label player1Name;
+    @FXML private Label erroruser;
+
+    private Stage stage;
 
     private Client client;
     private Checkersquare[][] squares = new Checkersquare[8][8];
     private String myName;
     private Checkersquare selectedSquare = null;
-    private String myColor = "RED";
+    private String myColor = "";
 
     public void setClient(Client client) {
         this.client = client;
     }
-
+    public void setStage(Stage stage) {
+        this.stage = stage;
+    }
     @FXML
     public void initialize() {
-        sendBtn.setDisable(true);
-        nameField.setDisable(true);
-        rematchBtn.setDisable(true);
-        buildBoard();
+//        sendBtn.setDisable(true);
+//        nameField.setDisable(true);
+//        rematchBtn.setDisable(true);
+//        buildBoard();
     }
 
     private void buildBoard() {
+
         for(int r = 0; r < 8;++r){
             for(int c = 0; c < 8;++c){
                 Checkersquare square;
@@ -63,10 +76,35 @@ public class CheckersAPI {
     public void handleServerMessage(Object data) {
         Message msg = (Message) data;
         if (msg.msgType() == Message.messageType.USERNAME) {
-            setUserName.setDisable(false);
-            setUserName.setDisable(true);
-            nameField.setDisable(true);
-            chatList.getItems().add(msg.returnMessage());
+            if(Objects.equals(msg.returnMessage(), "")){
+                erroruser.setVisible(true);
+            }
+            else{
+                myName = msg.returnMessage();
+                try {
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/FXML/checkersMulti.fxml"));
+                    Parent root = loader.load();
+
+                    CheckersAPI controller = loader.getController();
+
+                    controller.setClient(client);
+                    controller.setStage(stage);
+
+
+                    client.setController(controller);
+                    controller.buildBoard();
+
+
+                    stage.setScene(new Scene(root));
+                }
+                catch(Exception e){
+                    e.printStackTrace();
+                }
+            }
+//            setUserName.setDisable(false);
+//            setUserName.setDisable(true);
+//            nameField.setDisable(true);
+//            chatList.getItems().add(msg.returnMessage());
         }
         else if (msg.msgType() == Message.messageType.USERLOG) {
             listUsers.getItems().setAll(msg.getActiveUsers());
@@ -195,19 +233,27 @@ public class CheckersAPI {
 
         from.getStyleClass().remove("selected-square");
         selectedSquare = null;
-        if(myColor.equals("RED")) {
-            message = new Message(from.getRow(), from.getCol(), to.getRow(), to.getCol(), Message.messageType.CHECKERMOVE);
+        if(myColor != "") {
+            if (myColor.equals("RED")) {
+                message = new Message(from.getRow(), from.getCol(), to.getRow(), to.getCol(), Message.messageType.CHECKERMOVE);
+            } else {
+                message = new Message(7 - from.getRow(), 7 - from.getCol(), 7 - to.getRow(), 7 - to.getCol(), Message.messageType.CHECKERMOVE);
+            }
+            client.send(message);
         }
-        else{
-            message = new Message(7 - from.getRow(),7 - from.getCol(),7 - to.getRow(),7 - to.getCol(), Message.messageType.CHECKERMOVE);
-        }
-        client.send(message);
     }
 
     @FXML
     private void handleStartGame(ActionEvent event) {
-        Message message = new Message(Message.messageType.GAME_START);
+        Message message = new Message(userfield.getText(), Message.messageType.USERNAME);
         client.send(message);
+        userfield.clear();
+        if(myName != null) {
+
+            player1Name.setText(myName);
+            message = new Message(Message.messageType.GAME_START);
+            client.send(message);
+        }
     }
 
 }

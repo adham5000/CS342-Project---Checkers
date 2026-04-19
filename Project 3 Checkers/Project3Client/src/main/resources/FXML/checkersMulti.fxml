@@ -15,7 +15,7 @@
                         <VBox prefHeight="470.0" prefWidth="100.0">
                            <children>
                               <Label text="Chat:" />
-                              <ListView prefHeight="452.0" prefWidth="100.0" />
+                              <ListView fx:id = "chatList" prefHeight="452.0" prefWidth="100.0" />
                            </children>
                         </VBox>
                         <VBox prefHeight="470.0" prefWidth="440.0">
@@ -29,7 +29,7 @@
                            <children>
                               <Label text="Users:" />
                               <Label text="Online:" />
-                              <ListView prefHeight="200.0" prefWidth="200.0" />
+                              <ListView fx:id = "listUsers" prefHeight="200.0" prefWidth="200.0" />
                               <Label text="Offline:" />
                               <ListView prefHeight="200.0" prefWidth="200.0" />
                            </children></VBox>

@@ -113,7 +113,7 @@ public class Server {
 			}
 
 			msg = new Message("new client on server: client #" + count);
-			updateClients(msg);
+			//updateClients(msg);
 			callback.accept(msg);
 
 			 while(true) {
@@ -125,16 +125,17 @@ public class Server {
 							userNames.put(count, data.returnMessage());
 
 							msg = new Message("client: " + count + " name set: " + data.returnMessage());
-							updateClients(msg);
+							//updateClients(msg);
 							callback.accept(msg);
-
+							msg = new Message(data.returnMessage(),Message.messageType.USERNAME);
+							out.writeObject(msg);
 							ArrayList<String> tempList = new ArrayList<>(userNames.values());
 							msg = new Message(tempList, Message.messageType.USERLOG);
 							updateClients(msg);
 							callback.accept(msg);
 						}
 						else {
-							msg = new Message("Username is already taken.", Message.messageType.USERNAME);
+							msg = new Message("", Message.messageType.USERNAME);
 							out.writeObject(msg);
 						}
 					}

@@ -14,10 +14,10 @@
                           <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
                              <children>
                                 <Label text="Username: " />
-                                <TextField />
+                                <TextField fx:id = "userfield"/>
                              </children>
                           </HBox>
-                           <Label disable="true" text="Error: Username already taken." />
+                           <Label fx:id = "erroruser" visible="false" text="Error: Username already taken." />
                           <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
                              <children>
                                 <Label text="Password: " />
@@ -35,7 +35,7 @@
                         </RadioButton>
                         <RadioButton mnemonicParsing="false" text="Multiplayer" toggleGroup="$gameType" />
                   </HBox>
-                  <Button alignment="CENTER" mnemonicParsing="false" text="Play Game" />
+                  <Button alignment="CENTER" mnemonicParsing="false" text="Play Game" onAction = "#handleStartGame"/>
                </children>
             </VBox>
          </center>

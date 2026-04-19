@@ -66,6 +66,6 @@ public class Checkersquare extends Button {
         else{
             setTextFill(Color.WHITE);
         }
-        setFont(Font.font(30));
+        setFont(Font.font(15));
     }
 }

@@ -31,16 +31,18 @@ public class GuiClient extends Application{
 
 	@Override
 	public void start(Stage primaryStage) throws Exception {
-		FXMLLoader loader = new FXMLLoader(getClass().getResource("/FXML/scene1.fxml"));
+		FXMLLoader loader = new FXMLLoader(getClass().getResource("/FXML/login.fxml"));
 		Parent root = loader.load();
 
 		CheckersAPI controller = loader.getController();
 		clientConnection = new Client(data->{
-				Platform.runLater(()->{controller.handleServerMessage(data);});
+				Platform.runLater(()->{clientConnection.getController().handleServerMessage(data);});
 		});
-							
+		clientConnection.setController(controller);
+
 		clientConnection.start();
 		controller.setClient(clientConnection);
+		controller.setStage(primaryStage);
 
 		Scene scene = new Scene(root);
 		scene.getStylesheets().add(
@@ -60,7 +62,7 @@ public class GuiClient extends Application{
 		primaryStage.show();
 		
 	}
-	
+
 
 
 

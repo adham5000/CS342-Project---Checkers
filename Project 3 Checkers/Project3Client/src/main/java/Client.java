@@ -14,7 +14,14 @@ public class Client extends Thread{
 	ObjectInputStream in;
 	
 	private Consumer<Serializable> callback;
-	
+	private CheckersAPI controller;
+
+	public void setController(CheckersAPI controller) {
+		this.controller = controller;
+	}
+	public CheckersAPI getController() {
+		return controller;
+	}
 	Client(Consumer<Serializable> call){
 	
 		callback = call;
