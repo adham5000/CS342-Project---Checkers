@@ -5,7 +5,7 @@
 
 <AnchorPane prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="CheckersAPI">
    <children>
-      <BorderPane layoutY="-1.0" prefHeight="400.0" prefWidth="600.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
+      <BorderPane layoutY="-1.0" prefHeight="600.0" prefWidth="800.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
          <center>
             <VBox alignment="CENTER" prefHeight="380.0" prefWidth="580.0" spacing="10.0" BorderPane.alignment="CENTER">
                <children>
@@ -14,10 +14,10 @@
                           <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
                              <children>
                                 <Label text="Username: " />
-                                <TextField fx:id = "userfield"/>
+                                <TextField fx:id="userfield" />
                              </children>
                           </HBox>
-                           <Label fx:id = "erroruser" visible="false" text="Error: Username already taken." />
+                           <Label fx:id="erroruser" text="Error: Username already taken." visible="false" />
                           <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
                              <children>
                                 <Label text="Password: " />
@@ -28,14 +28,14 @@
                      </children>
                   </VBox>
                   <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
-                      <RadioButton mnemonicParsing="false" selected="true" text="Singleplayer">
-                            <toggleGroup>
-                                <ToggleGroup fx:id="gameType" />
-                            </toggleGroup>/>
-                        </RadioButton>
-                        <RadioButton mnemonicParsing="false" text="Multiplayer" toggleGroup="$gameType" />
+                     <Button alignment="CENTER" mnemonicParsing="false" onAction="#handleStartGame" text="Play Game" />
+<!--                      <RadioButton mnemonicParsing="false" selected="true" text="Singleplayer">-->
+<!--                            <toggleGroup>-->
+<!--                                <ToggleGroup fx:id="gameType" />-->
+<!--                            </toggleGroup>/>-->
+<!--                        </RadioButton>-->
+<!--                        <RadioButton mnemonicParsing="false" text="Multiplayer" toggleGroup="$gameType" />-->
                   </HBox>
-                  <Button alignment="CENTER" mnemonicParsing="false" text="Play Game" onAction = "#handleStartGame"/>
                </children>
             </VBox>
          </center>

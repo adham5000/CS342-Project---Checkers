@@ -8,46 +8,44 @@
    <children>
       <BorderPane layoutX="2.0" layoutY="2.0" prefHeight="600.0" prefWidth="800.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
          <center>
-            <VBox prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
+            <VBox prefHeight="600.0" prefWidth="800.0" spacing="10.0" BorderPane.alignment="CENTER">
                <children>
-                  <HBox alignment="CENTER" prefHeight="485.0" prefWidth="780.0">
+                  <HBox prefHeight="470.0" prefWidth="780.0" spacing="10.0">
                      <children>
-                        <VBox prefHeight="470.0" prefWidth="100.0">
+                        <VBox prefHeight="470.0" prefWidth="180.0">
                            <children>
                               <Label text="Moves:" />
-                              <ListView fx:id="listMoves" prefHeight="201.0" prefWidth="100.0" />
+                              <ListView fx:id="listMoves" prefHeight="217.6" prefWidth="180.0" />
                               <Label text="Chat:" />
-                              <ListView fx:id = "chatList" prefHeight="200.0" prefWidth="200.0" />
+                              <ListView fx:id="chatList" prefHeight="217.6" prefWidth="180.0" />
                            </children>
                         </VBox>
-                        <VBox prefHeight="470.0" prefWidth="440.0">
+                        <!-- This damn VBOX is causing me headaches with the stupid Your Name label not working during runtime -->
+                        <VBox prefHeight="470.0" prefWidth="400.0" VBox.vgrow="ALWAYS">
                            <children>
                               <Label fx:id="player2Name" text="Opponents Name" />
-                               <GridPane fx:id="board" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" VBox.vgrow="ALWAYS" />
-                              <Label fx:id="player1Name" text="Your Name">
-                                 <VBox.margin>
-                                    <Insets />
-                                 </VBox.margin></Label>
+                              <GridPane fx:id="board" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="425.2" prefWidth="400.0" />
+                              <Label fx:id="player1Name" text="Your Name" />
                            </children>
                         </VBox>
-                        <VBox prefHeight="470.0" prefWidth="100.0">
+                        <VBox prefHeight="470.0" prefWidth="180.0">
                            <children>
-                              <Label text="Users:" />
-                              <Label text="Online:" />
-                              <ListView fx:id="listUsers" prefHeight="200.0" prefWidth="200.0" />
-                              <Label text="Offline:" />
-                              <ListView prefHeight="200.0" prefWidth="200.0" />
-                           </children></VBox>
+                              <Label text="Users Online:" />
+                              <ListView fx:id="listUsers" prefHeight="217.6" prefWidth="180.0" />
+                              <Label text="Users Offline:" />
+                              <ListView prefHeight="217.6" prefWidth="180.0" />
+                           </children>
+                        </VBox>
                      </children>
                   </HBox>
-                  <HBox prefHeight="100.0" prefWidth="200.0">
+                  <HBox prefHeight="100.0" prefWidth="780.0">
                      <children>
-                        <Button mnemonicParsing="false" text="Send" onAction="#sendButtonHandler"/>
-                        <TextField fx:id = "sendField"/>
+                        <Button mnemonicParsing="false" onAction="#sendButtonHandler" text="Send" />
+                        <TextField fx:id="sendField" />
                         <Button fx:id="startGameBtn" mnemonicParsing="false" onAction="#handleRandomGame" text="start random game" />
                         <Button mnemonicParsing="false" text="Add Friend">
                            <HBox.margin>
-                              <Insets left="300.0" />
+                              <Insets left="246.0" />
                            </HBox.margin></Button>
                         <TextField />
                      </children>
