@@ -9,6 +9,7 @@ public class Message implements Serializable {
         GROUP,// For creating groups
         CHECKERMOVE,// For moves
         GAME_START,
+        GAME_OVER,
     }
 
     private String stringMessage;

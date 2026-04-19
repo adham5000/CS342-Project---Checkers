@@ -161,9 +161,19 @@ public class Server {
 								out.writeObject(msg);
 							} else {
 								if(game.whiteLost()){
+									msg = new Message("RED WON", Message.messageType.GAME_OVER);
+									if(playerColor == 2){
+										out.writeObject(msg);
 
+									}
+									else {
+
+									}
 								}
 								if(game.redLost()){
+
+								}
+								if(game.movesWithoutCap == 0){
 
 								}
 								game.getOpponent(this).out.writeObject(msg);
@@ -242,6 +252,7 @@ public class Server {
 		private int[][] board = new int[8][8];
 		private int turn;
 		public boolean canMoveAgain;
+		public int movesWithoutCap;
 
 		public GameSession(ClientThread r, ClientThread b) {
 			this.redPlayer = r;
@@ -250,6 +261,7 @@ public class Server {
 			this.blackPlayer.playerColor = 2;
 			this.turn = 1;
 			this.canMoveAgain = false;
+			this.movesWithoutCap = 0;
 			initializeBoard();
 		}
 
@@ -370,6 +382,7 @@ public class Server {
 					kingCol = toCol;
 					board[kingRow][kingCol] = 4;
 				}
+				++movesWithoutCap;
 				msg = new Message(fromRow,fromCol,toRow,toCol,-1,-1,kingRow,kingCol, Message.messageType.CHECKERMOVE);
 				return msg;
 			}
@@ -405,6 +418,7 @@ public class Server {
 					board[kingRow][kingCol] = 4;
 				}
 				canMoveAgain = canJumpAgain(toRow, toCol);
+				movesWithoutCap = 0;
 				msg = new Message(fromRow,fromCol,toRow,toCol,capturedRow,capturedCol,kingRow,kingCol, Message.messageType.CHECKERMOVE);
 				return msg;
 			}
@@ -524,6 +538,65 @@ public class Server {
 				}
 			}
 			return false;
+		}
+		private boolean canMakeSimpleMove(int row ,int col){
+			if(board[row][col] == 1 || board[row][col] == 3) {
+				if(row + 1 < 8 && col + 1 < 8 && board[row+1][col+1] == 0){
+					return true;
+				}
+				if(row + 1 < 8 && col - 1 >= 0 && board[row+1][col-1] == 0){
+					return true;
+				}
+			}
+			if(board[row][col] == 3){
+				if(row - 1 >= 0 && col - 1 < 8 && board[row-1][col-1] == 0){
+					return true;
+				}
+				if(row -1 >= 0 && col + 1 < 8 && board[row-1][col+1] == 0){
+					return true;
+				}
+			}
+			if(board[row][col] == 2 ||  board[row][col] == 4){
+				if(row - 1 >= 0 && col - 1 < 8 && board[row-1][col-1] == 0){
+					return true;
+				}
+				if(row - 1 >= 0 && col + 1 < 8 && board[row-1][col+1] == 0){
+					return true;
+				}
+			}
+			if(board[row][col] == 4){
+				if(row + 1 < 8 && col - 1 >= 0 && board[row+1][col-1] == 0){
+					return true;
+				}
+				if(row + 1 < 8 && col + 1 < 8 && board[row+1][col+1] == 0){
+					return true;
+				}
+			}
+			return false;
+		}
+		public boolean redLost(){
+			for(int r = 0; r < 8; r++) {
+				for(int c = 0; c < 8; c++) {
+					if(board[r][c] == 1 || board[r][c] == 3){
+						if(canMakeSimpleMove(r,c) || canJumpAgain(r,c)){
+							return false;
+						}
+					}
+				}
+			}
+			return true;
+		}
+		public boolean whiteLost(){
+			for(int r = 0; r < 8; r++) {
+				for(int c = 0; c < 8; c++) {
+					if(board[r][c] == 2 || board[r][c] == 4){
+						if(canMakeSimpleMove(r,c) || canJumpAgain(r,c)){
+							return false;
+						}
+					}
+				}
+			}
+			return true;
 		}
 	}
 
