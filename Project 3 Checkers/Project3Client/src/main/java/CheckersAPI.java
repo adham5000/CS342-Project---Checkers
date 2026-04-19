@@ -91,6 +91,7 @@ public class CheckersAPI {
 
                     CheckersAPI controller = loader.getController();
 
+                    controller.myName = this.myName;
                     controller.setClient(client);
                     controller.setStage(stage);
 
