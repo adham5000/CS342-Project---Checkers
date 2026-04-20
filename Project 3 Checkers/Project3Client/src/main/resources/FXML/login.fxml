@@ -21,7 +21,7 @@
                           <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
                              <children>
                                 <Label text="Password: " />
-                                <TextField />
+                                <TextField fx:id = "passfield"/>
                              </children>
                           </HBox>
                            <Label disable="true" text="Error: Wrong Password for Username" />

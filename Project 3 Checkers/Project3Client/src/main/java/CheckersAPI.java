@@ -20,7 +20,7 @@ public class CheckersAPI {
     @FXML private ListView<String> listUsers;
     @FXML private ListView<String> listMoves;
     @FXML private TextField chatInput;
-    @FXML private TextField nameField;
+    @FXML private TextField passfield;
     @FXML private TextField userfield;
     @FXML private Button setUserName;
     @FXML private Button startGameBtn;
@@ -264,9 +264,14 @@ public class CheckersAPI {
 
     @FXML
     private void handleStartGame(ActionEvent event) {
-        Message message = new Message(userfield.getText(), Message.messageType.USERNAME);
+        ArrayList<String> namepass =  new ArrayList<>();
+        namepass.add(userfield.getText());
+        namepass.add(passfield.getText());
+
+        Message message = new Message(namepass, Message.messageType.USERNAME);
         client.send(message);
         userfield.clear();
+        passfield.clear();
     }
     @FXML void handleRandomGame(ActionEvent event) {
         Message message = new Message(Message.messageType.GAME_START);

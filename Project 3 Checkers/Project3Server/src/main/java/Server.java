@@ -1,19 +1,12 @@
-import java.awt.*;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
+import java.util.*;
 import java.util.function.Consumer;
 
-import javafx.application.Platform;
-import javafx.scene.control.ListView;
-
-import java.util.Queue;
 import java.util.LinkedList;
 
 public class Server {
@@ -23,11 +16,24 @@ public class Server {
 	TheServer server;
 	private Consumer<Serializable> callback;
 	HashMap<Integer, String> userNames = new HashMap<>();
-
+	HashMap<String,String> userInfo = new HashMap<>();
 	private final Queue<ClientThread> waitList = new LinkedList<>();
 	private final ArrayList<GameSession> activeGames = new ArrayList<>();
-
+	Scanner sc;
 	Server(Consumer<Serializable> call){
+
+		try {
+			sc = new Scanner(Path.of("info.txt"));
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		while(sc.hasNext()){
+			String name = sc.next();
+			String password = sc.next();
+			userInfo.put(name,password);
+			sc.nextLine();
+		}
 
 		callback = call;
 		server = new TheServer();
@@ -121,13 +127,31 @@ public class Server {
 					Message data = (Message) in.readObject(); // This reads txt from client
 
 					if (data.msgType() == Message.messageType.USERNAME) {
-						if (!userNames.containsValue(data.returnMessage())) {
-							userNames.put(count, data.returnMessage());
+						if (!userInfo.containsKey(data.getActiveUsers().get(0))) {
+							userNames.put(count, data.getActiveUsers().get(0));
 
-							msg = new Message("client: " + count + " name set: " + data.returnMessage());
+							Files.write(
+									Path.of("info.txt"),
+									(data.getActiveUsers().get(0) + " " + data.getActiveUsers().get(1)+ "\n").getBytes(),
+									StandardOpenOption.APPEND
+							);
+							userInfo.put(data.getActiveUsers().get(0),data.getActiveUsers().get(1));
+							msg = new Message("client: " + count + " name set: " + data.getActiveUsers().get(0));
 							//updateClients(msg);
 							callback.accept(msg);
-							msg = new Message(data.returnMessage(),Message.messageType.USERNAME);
+							msg = new Message(data.getActiveUsers().get(0),Message.messageType.USERNAME);
+							out.writeObject(msg);
+							ArrayList<String> tempList = new ArrayList<>(userNames.values());
+							msg = new Message(tempList, Message.messageType.USERLOG);
+							updateClients(msg);
+							callback.accept(msg);
+						}
+						else if(userInfo.containsKey(data.getActiveUsers().get(0)) && userInfo.get(data.getActiveUsers().get(0)).equals(data.getActiveUsers().get(1))){
+							userNames.put(count, data.getActiveUsers().get(0));
+							msg = new Message("client: " + count + " name set: " + data.getActiveUsers().get(0));
+							//updateClients(msg);
+							callback.accept(msg);
+							msg = new Message(data.getActiveUsers().get(0),Message.messageType.USERNAME);
 							out.writeObject(msg);
 							ArrayList<String> tempList = new ArrayList<>(userNames.values());
 							msg = new Message(tempList, Message.messageType.USERLOG);
