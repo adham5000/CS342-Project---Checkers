@@ -161,22 +161,6 @@ public class Server {
 							if (msg.returnMessage() != null) {
 								out.writeObject(msg);
 							} else {
-								if(game.whiteLost()){
-									msg = new Message("RED WON", Message.messageType.GAME_OVER);
-									if(playerColor == 2){
-										out.writeObject(msg);
-
-									}
-									else {
-
-									}
-								}
-								if(game.redLost()){
-
-								}
-								if(game.movesWithoutCap == 0){
-
-								}
 								game.getOpponent(this).out.writeObject(msg);
 								out.writeObject(msg);
 								if (!game.canMoveAgain) {
@@ -186,7 +170,49 @@ public class Server {
 										game.setTurn(1);
 									}
 								}
+								if(game.whiteLost()){
+									msg = new Message("RED WON", Message.messageType.GAME_OVER);
+									game.getWhitePlayer().out.writeObject(msg);
+									msg = new Message("YOU WON", Message.messageType.GAME_OVER);
+									game.getRedPlayer().out.writeObject(msg);
+									activeGames.remove(game);
+									game = null;
+								}
+								if(game.redLost() && game != null){
+									msg = new Message("WHITE WON", Message.messageType.GAME_OVER);
+									game.getRedPlayer().out.writeObject(msg);
+									msg = new Message("YOU WON", Message.messageType.GAME_OVER);
+									game.getWhitePlayer().out.writeObject(msg);
+									activeGames.remove(game);
+									game = null;
+								}
+								if(game.movesWithoutCap == 40 && game != null){
+									msg = new Message("DRAW", Message.messageType.GAME_OVER);
+									game.getWhitePlayer().out.writeObject(msg);
+									game.getRedPlayer().out.writeObject(msg);
+									activeGames.remove(game);
+									game = null;
+								}
 							}
+						}
+					}
+					else if(data.msgType() == Message.messageType.GAME_OVER && game!=null){
+						if(playerColor == 1){
+							game.player1draw = true;
+						}
+						else{
+							game.player2draw = true;
+						}
+						if(game.player1draw && game.player2draw){
+							msg = new Message("DRAW", Message.messageType.GAME_OVER);
+							out.writeObject(msg);
+							game.getOpponent(this).out.writeObject(msg);
+							activeGames.remove(game);
+							game = null;
+						}
+						else {
+							msg = new Message("Your Opponent requested a draw");
+							game.getOpponent(this).out.writeObject(msg);
 						}
 					}
 					else if(data.msgType() == Message.messageType.GLOBAL && game!=null){
@@ -196,6 +222,7 @@ public class Server {
 					}
 				}
 				catch(Exception e) {
+					e.printStackTrace();
 					msg = new Message("OOOOPPs...Something wrong with the socket from client: " + count + "....closing down!");
 					callback.accept(msg);
 
@@ -251,25 +278,34 @@ public class Server {
 
 
 		private ClientThread redPlayer;
-		private ClientThread blackPlayer;
+		private ClientThread whitePlayer;
 		private int[][] board = new int[8][8];
 		private int turn;
 		public boolean canMoveAgain;
 		public int movesWithoutCap;
+		public boolean player1draw;
+		public boolean player2draw;
 
 		public GameSession(ClientThread r, ClientThread b) {
 			this.redPlayer = r;
 			this.redPlayer.playerColor = 1;
-			this.blackPlayer = b;
-			this.blackPlayer.playerColor = 2;
+			this.whitePlayer = b;
+			this.whitePlayer.playerColor = 2;
 			this.turn = 1;
 			this.canMoveAgain = false;
 			this.movesWithoutCap = 0;
+			this.player1draw = false;
+			this.player2draw = false;
 			initializeBoard();
 		}
-
+		public ClientThread getRedPlayer() {
+			return redPlayer;
+		}
+		public ClientThread getWhitePlayer() {
+			return whitePlayer;
+		}
 		public ClientThread getOpponent(ClientThread p) {
-			return (p == redPlayer) ? blackPlayer : redPlayer;
+			return (p == redPlayer) ? whitePlayer : redPlayer;
 		}
 		private void initializeBoard() {
 			for (int r = 0; r < 8; r++) {
@@ -560,7 +596,7 @@ public class Server {
 				}
 			}
 			if(board[row][col] == 2 ||  board[row][col] == 4){
-				if(row - 1 >= 0 && col - 1 < 8 && board[row-1][col-1] == 0){
+				if(row - 1 >= 0 && col - 1 >= 0 && board[row-1][col-1] == 0){
 					return true;
 				}
 				if(row - 1 >= 0 && col + 1 < 8 && board[row-1][col+1] == 0){

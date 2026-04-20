@@ -11,33 +11,34 @@
             <VBox prefHeight="600.0" prefWidth="800.0" spacing="10.0" BorderPane.alignment="CENTER">
                <HBox prefHeight="470.0" prefWidth="780.0" spacing="10.0">
                   <VBox prefHeight="470.0" prefWidth="180.0">
-                     <Label text="Moves:"/>
-                     <ListView fx:id="listMoves" prefHeight="217.6" prefWidth="180.0"/>
-                     <Label text="Chat:"/>
-                     <ListView fx:id="chatList" prefHeight="217.6" prefWidth="180.0"/>
+                     <Label text="Moves:" />
+                     <ListView fx:id="listMoves" prefHeight="217.6" prefWidth="180.0" />
+                     <Label text="Chat:" />
+                     <ListView fx:id="chatList" prefHeight="217.6" prefWidth="180.0" />
                   </VBox>
                   <VBox prefHeight="470.0" prefWidth="400.0" spacing="5.0">
-                     <Label fx:id="player2Name" text="Opponents Name"/>
-                     <GridPane fx:id="board" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" VBox.vgrow="ALWAYS"/>
-                     <Label fx:id="player1Name" text="Your Name"/>
+                     <Label fx:id="player2Name" text="Opponents Name" />
+                     <GridPane fx:id="board" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" VBox.vgrow="ALWAYS" />
+                     <Label fx:id="player1Name" text="Your Name" />
                   </VBox>
                   <VBox prefHeight="470.0" prefWidth="180.0">
-                     <Label text="Users Online:"/>
-                     <ListView fx:id="listUsers" prefHeight="217.6" prefWidth="180.0"/>
-                     <Label text="Users Offline:"/>
-                     <ListView prefHeight="217.6" prefWidth="180.0"/>
+                     <Label text="Users Online:" />
+                     <ListView fx:id="listUsers" prefHeight="217.6" prefWidth="180.0" />
+                     <Label text="Users Offline:" />
+                     <ListView prefHeight="217.6" prefWidth="180.0" />
                   </VBox>
                </HBox>
                <HBox prefHeight="100.0" prefWidth="780.0">
-                  <Button mnemonicParsing="false" onAction="#sendButtonHandler" text="Send"/>
-                  <TextField fx:id="sendField"/>
-                  <Button fx:id="startGameBtn" mnemonicParsing="false" onAction="#handleRandomGame" text="start random game"/>
+                  <Button mnemonicParsing="false" onAction="#sendButtonHandler" text="Send" />
+                  <TextField fx:id="sendField" />
+                  <Button fx:id="startGameBtn" mnemonicParsing="false" onAction="#handleRandomGame" text="start random game" />
+                  <Button fx:id = "drawBtn" mnemonicParsing="false" prefHeight="25.0" prefWidth="102.0" text="request draw" onAction = "#drawBtnHandler"/>
                   <Button mnemonicParsing="false" text="Add Friend">
                      <HBox.margin>
-                        <Insets left="246.0"/>
+                        <Insets left="246.0" />
                      </HBox.margin>
                   </Button>
-                  <TextField/>
+                  <TextField />
                </HBox>
             </VBox>
          </center>

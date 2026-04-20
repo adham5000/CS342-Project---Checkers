@@ -24,7 +24,7 @@ public class CheckersAPI {
     @FXML private TextField userfield;
     @FXML private Button setUserName;
     @FXML private Button startGameBtn;
-    @FXML private Button rematchBtn;
+    @FXML private Button drawBtn;
     @FXML private Button sendBtn;
     @FXML private Label player1Name;
     @FXML private Label player2Name;
@@ -46,12 +46,7 @@ public class CheckersAPI {
         this.stage = stage;
     }
     @FXML
-    public void initialize() {
-//        sendBtn.setDisable(true);
-//        nameField.setDisable(true);
-//        rematchBtn.setDisable(true);
-//        buildBoard();
-    }
+    public void initialize() {}
 
     private void buildBoard() {
 
@@ -74,6 +69,7 @@ public class CheckersAPI {
                 squares[r][c] = square;
             }
         }
+        drawBtn.setDisable(true);
         player1Name.setText(myName);
     }
 
@@ -106,16 +102,13 @@ public class CheckersAPI {
                     e.printStackTrace();
                 }
             }
-//            setUserName.setDisable(false);
-//            setUserName.setDisable(true);
-//            nameField.setDisable(true);
-//            chatList.getItems().add(msg.returnMessage());
         }
         else if (msg.msgType() == Message.messageType.USERLOG) {
             listUsers.getItems().setAll(msg.getActiveUsers());
         }
         else if(msg.msgType() == Message.messageType.GAME_START){
             startGameBtn.setDisable(true);
+            drawBtn.setDisable(false);
             if(Objects.equals(msg.returnMessage(), "RED")){
                 myColor = "RED";
                 player2Name.setText(msg.getActiveUsers().get(1));
@@ -130,6 +123,9 @@ public class CheckersAPI {
                         }
                         else if ((r == 6 && c % 2 == 0) || (r == 7 && c % 2 == 1) || (r == 5 && c % 2 == 1)) {
                             squares[r][c].setPiece(Checkersquare.Piece.WHITE);
+                        }
+                        else{
+                            squares[r][c].setPiece(Checkersquare.Piece.EMPTY);
                         }
                     }
                 }
@@ -150,6 +146,9 @@ public class CheckersAPI {
                         }
                         else if ((r == 6 && c % 2 == 0) || (r == 7 && c % 2 == 1) || (r == 5 && c % 2 == 1)) {
                             squares[r][c].setPiece(Checkersquare.Piece.RED);
+                        }
+                        else{
+                            squares[r][c].setPiece(Checkersquare.Piece.EMPTY);
                         }
                     }
                 }
@@ -215,6 +214,12 @@ public class CheckersAPI {
                 }
             }
         }
+        else if (msg.msgType() == Message.messageType.GAME_OVER){
+            myColor = "";
+            listMoves.getItems().add((msg.returnMessage()));
+            startGameBtn.setDisable(false);
+            drawBtn.setDisable(true);
+        }
         else {
             chatList.getItems().add(msg.returnMessage());
         }
@@ -222,19 +227,6 @@ public class CheckersAPI {
     }
     @FXML
     private void sendButtonHandler(ActionEvent event) {
-//        if (nameField.getText().isEmpty()) {
-//            Message message = new Message(chatInput.getText(), Message.messageType.GLOBAL);
-//            client.send(message);
-//            chatInput.clear();
-//        }
-//        else {
-//            String[] items = nameField.getText().split(",");
-//            ArrayList<String> temp = new ArrayList<>(Arrays.asList(items));
-//            temp.add(myName);
-//            Message message = new Message(chatInput.getText(), Message.messageType.GROUP, temp);
-//            client.send(message);
-//            chatInput.clear();
-//        }
         if(!sendField.getText().isEmpty() && !Objects.equals(myColor, "")){
             Message message = new Message(sendField.getText(), Message.messageType.GLOBAL);
             client.send(message);
@@ -242,20 +234,9 @@ public class CheckersAPI {
             sendField.clear();
         }
     }
-    @FXML
-    private void setNameButtonHandler(ActionEvent event) {
-        Message message = new Message(chatInput.getText(), Message.messageType.USERNAME);
-        client.send(message);
-        setUserName.setDisable(true);
-        sendBtn.setDisable(false);
-        nameField.setDisable(false);
-        myName = chatInput.getText();
-        player1Name.setText(myName);
-        chatInput.clear();
-    }
+
     @FXML
     private void handleSquareClick(Checkersquare square) {
-
         if(selectedSquare == null){
             if(square.getPiece() == Checkersquare.Piece.EMPTY){
                 return;
@@ -286,15 +267,15 @@ public class CheckersAPI {
         Message message = new Message(userfield.getText(), Message.messageType.USERNAME);
         client.send(message);
         userfield.clear();
-//        if(myName != null) {
-//
-//            player1Name.setText(myName);
-//            message = new Message(Message.messageType.GAME_START);
-//            client.send(message);
-//        }
     }
     @FXML void handleRandomGame(ActionEvent event) {
         Message message = new Message(Message.messageType.GAME_START);
         client.send(message);
+    }
+
+    @FXML void drawBtnHandler(ActionEvent event) {
+        Message msg = new Message("DRAW", Message.messageType.GAME_OVER);
+        drawBtn.setDisable(true);
+        client.send(msg);
     }
 }
