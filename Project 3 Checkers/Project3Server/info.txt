@@ -1,3 +1,4 @@
-test test
-as as
-da da
+test test 0 0 0
+as as 0 0 0
+da da 0 0 0
+Another test 0 0 0

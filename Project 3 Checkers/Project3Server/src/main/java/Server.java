@@ -17,8 +17,20 @@ public class Server {
 	private Consumer<Serializable> callback;
 	HashMap<Integer, String> userNames = new HashMap<>();
 	HashMap<String,String> userInfo = new HashMap<>();
+	HashMap<String,MyWinDrawLoss> userScores = new HashMap<>();
 	private final Queue<ClientThread> waitList = new LinkedList<>();
 	private final ArrayList<GameSession> activeGames = new ArrayList<>();
+	public class MyWinDrawLoss{
+		public final int wins;
+		public final int draws;
+		public final int losses;
+
+		public MyWinDrawLoss(int wins, int draws, int losses) {
+			this.wins = wins;
+			this.draws = draws;
+			this.losses = losses;
+		}
+	}
 	Scanner sc;
 	Server(Consumer<Serializable> call){
 
@@ -31,6 +43,11 @@ public class Server {
 		while(sc.hasNext()){
 			String name = sc.next();
 			String password = sc.next();
+			int wins = Integer.parseInt(sc.next());
+			int draws = Integer.parseInt(sc.next());
+			int losses = Integer.parseInt(sc.next());
+			MyWinDrawLoss scores = new MyWinDrawLoss(wins, draws, losses);
+			userScores.put(name,scores);
 			userInfo.put(name,password);
 			sc.nextLine();
 		}
@@ -132,7 +149,7 @@ public class Server {
 
 							Files.write(
 									Path.of("info.txt"),
-									(data.getActiveUsers().get(0) + " " + data.getActiveUsers().get(1)+ "\n").getBytes(),
+									(data.getActiveUsers().get(0) + " " + data.getActiveUsers().get(1) + " 0 0 0" + "\n").getBytes(),
 									StandardOpenOption.APPEND
 							);
 							userInfo.put(data.getActiveUsers().get(0),data.getActiveUsers().get(1));
