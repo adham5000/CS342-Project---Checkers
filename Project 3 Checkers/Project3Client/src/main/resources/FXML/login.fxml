@@ -17,14 +17,13 @@
                                 <TextField fx:id="userfield" />
                              </children>
                           </HBox>
-                           <Label fx:id="erroruser" text="Error: Username already taken." visible="false" />
                           <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
                              <children>
                                 <Label text="Password: " />
                                 <TextField fx:id = "passfield"/>
                              </children>
                           </HBox>
-                           <Label disable="true" text="Error: Wrong Password for Username" />
+                           <Label fx:id="erroruser" visible="false" text="Error: Wrong Password/No Password entered" />
                      </children>
                   </VBox>
                   <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="10.0">

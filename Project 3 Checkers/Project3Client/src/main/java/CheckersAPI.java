@@ -270,8 +270,8 @@ public class CheckersAPI {
 
         Message message = new Message(namepass, Message.messageType.USERNAME);
         client.send(message);
-        userfield.clear();
-        passfield.clear();
+       // userfield.clear();
+       // passfield.clear();
     }
     @FXML void handleRandomGame(ActionEvent event) {
         Message message = new Message(Message.messageType.GAME_START);

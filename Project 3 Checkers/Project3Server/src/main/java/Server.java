@@ -127,7 +127,7 @@ public class Server {
 					Message data = (Message) in.readObject(); // This reads txt from client
 
 					if (data.msgType() == Message.messageType.USERNAME) {
-						if (!userInfo.containsKey(data.getActiveUsers().get(0))) {
+						if (!userInfo.containsKey(data.getActiveUsers().get(0)) && !Objects.equals(data.getActiveUsers().get(1), "")) {
 							userNames.put(count, data.getActiveUsers().get(0));
 
 							Files.write(
