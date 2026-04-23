@@ -32,13 +32,23 @@
                   <Button mnemonicParsing="false" onAction="#sendButtonHandler" text="Send" />
                   <TextField fx:id="sendField" />
                   <Button fx:id="startGameBtn" mnemonicParsing="false" onAction="#handleRandomGame" text="start random game" />
-                  <Button fx:id = "drawBtn" mnemonicParsing="false" prefHeight="25.0" prefWidth="102.0" text="request draw" onAction = "#drawBtnHandler"/>
+                  <Button fx:id="drawBtn" mnemonicParsing="false" onAction="#drawBtnHandler" prefHeight="25.0" prefWidth="102.0" text="request draw" />
                   <Button mnemonicParsing="false" text="Add Friend">
                      <HBox.margin>
-                        <Insets left="246.0" />
+                        <Insets left="142.0" />
                      </HBox.margin>
                   </Button>
                   <TextField />
+               </HBox>
+               <HBox prefHeight="100.0" prefWidth="200.0">
+                  <children>
+                     <Label fx:id="player1WinDrawLoss" text="Player1 scores" />
+                     <Label fx:id="player2WinDrawLoss" text="Player2 scores">
+                        <HBox.margin>
+                           <Insets left="300.0" />
+                        </HBox.margin>
+                     </Label>
+                  </children>
                </HBox>
             </VBox>
          </center>

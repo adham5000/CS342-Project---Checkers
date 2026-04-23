@@ -17,20 +17,20 @@ public class Server {
 	private Consumer<Serializable> callback;
 	HashMap<Integer, String> userNames = new HashMap<>();
 	HashMap<String,String> userInfo = new HashMap<>();
-	HashMap<String,MyWinDrawLoss> userScores = new HashMap<>();
+	HashMap<String, Message.MyWinDrawLoss> userScores = new HashMap<>();
 	private final Queue<ClientThread> waitList = new LinkedList<>();
 	private final ArrayList<GameSession> activeGames = new ArrayList<>();
-	public class MyWinDrawLoss{
-		public final int wins;
-		public final int draws;
-		public final int losses;
-
-		public MyWinDrawLoss(int wins, int draws, int losses) {
-			this.wins = wins;
-			this.draws = draws;
-			this.losses = losses;
-		}
-	}
+//	public class MyWinDrawLoss{
+//		public final int wins;
+//		public final int draws;
+//		public final int losses;
+//
+//		public MyWinDrawLoss(int wins, int draws, int losses) {
+//			this.wins = wins;
+//			this.draws = draws;
+//			this.losses = losses;
+//		}
+//	}
 	Scanner sc;
 	Server(Consumer<Serializable> call){
 
@@ -46,7 +46,7 @@ public class Server {
 			int wins = Integer.parseInt(sc.next());
 			int draws = Integer.parseInt(sc.next());
 			int losses = Integer.parseInt(sc.next());
-			MyWinDrawLoss scores = new MyWinDrawLoss(wins, draws, losses);
+			Message.MyWinDrawLoss scores = new Message.MyWinDrawLoss(wins, draws, losses);
 			userScores.put(name,scores);
 			userInfo.put(name,password);
 			sc.nextLine();
@@ -153,10 +153,14 @@ public class Server {
 									StandardOpenOption.APPEND
 							);
 							userInfo.put(data.getActiveUsers().get(0),data.getActiveUsers().get(1));
+							Message.MyWinDrawLoss newScore = new Message.MyWinDrawLoss(0, 0, 0);
+							userScores.put(data.getActiveUsers().get(0), newScore);
 							msg = new Message("client: " + count + " name set: " + data.getActiveUsers().get(0));
 							//updateClients(msg);
 							callback.accept(msg);
 							msg = new Message(data.getActiveUsers().get(0),Message.messageType.USERNAME);
+							out.writeObject(msg);
+							msg = new Message(userScores, Message.messageType.SCORES);
 							out.writeObject(msg);
 							ArrayList<String> tempList = new ArrayList<>(userNames.values());
 							msg = new Message(tempList, Message.messageType.USERLOG);
@@ -169,6 +173,8 @@ public class Server {
 							//updateClients(msg);
 							callback.accept(msg);
 							msg = new Message(data.getActiveUsers().get(0),Message.messageType.USERNAME);
+							out.writeObject(msg);
+							msg = new Message(userScores, Message.messageType.SCORES);
 							out.writeObject(msg);
 							ArrayList<String> tempList = new ArrayList<>(userNames.values());
 							msg = new Message(tempList, Message.messageType.USERLOG);

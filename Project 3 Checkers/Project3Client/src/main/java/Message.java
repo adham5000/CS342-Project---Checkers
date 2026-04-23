@@ -1,5 +1,6 @@
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class Message implements Serializable {
     public enum messageType {
@@ -10,6 +11,20 @@ public class Message implements Serializable {
         CHECKERMOVE,// For moves
         GAME_START,
         GAME_OVER,
+        SCORES,
+    }
+
+    public static class MyWinDrawLoss implements Serializable {
+        private static final long serialVersionUID = 1L;
+        public final int wins;
+        public final int draws;
+        public final int losses;
+
+        public MyWinDrawLoss(int wins, int draws, int losses) {
+            this.wins = wins;
+            this.draws = draws;
+            this.losses = losses;
+        }
     }
 
     private String stringMessage;
@@ -23,6 +38,7 @@ public class Message implements Serializable {
     private int capturedCol;
     private int kingRow;
     private int kingCol;
+    private HashMap<String, MyWinDrawLoss> winDrawLoss;
 
     public Message(String stringMessage) {
         this.stringMessage = stringMessage;
@@ -31,6 +47,11 @@ public class Message implements Serializable {
 
     public Message(String stringMessage, messageType type) {
         this.stringMessage = stringMessage;
+        this.type = type;
+    }
+
+    public Message(HashMap<String, MyWinDrawLoss>  scores, messageType type) {
+        this.winDrawLoss = scores;
         this.type = type;
     }
 
@@ -99,6 +120,7 @@ public class Message implements Serializable {
     public String returnMessage() {return stringMessage;}
     public messageType msgType() {return type;}
     public ArrayList<String> getActiveUsers() { return Users; }
+    public HashMap<String, MyWinDrawLoss> getWinDrawLoss() {return winDrawLoss;}
 
     static final long serialVersionUID = 42L;
 
