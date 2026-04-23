@@ -309,8 +309,12 @@ public class Server {
 		ArrayList<String> names = new ArrayList<>();
 		names.add(userNames.get(p1.count));
 		names.add(userNames.get(p2.count));
-		Message msg = new Message("RED",Message.messageType.GAME_START, names);
+		Message msg;
 		try {
+			msg = new Message(userScores, Message.messageType.SCORES);
+			p1.out.writeObject(msg);
+			p2.out.writeObject(msg);
+			msg = new Message("RED",Message.messageType.GAME_START, names);
 			p1.out.writeObject(msg);
 			msg = new Message("WHITE", Message.messageType.GAME_START, names);
 			p2.out.writeObject(msg);

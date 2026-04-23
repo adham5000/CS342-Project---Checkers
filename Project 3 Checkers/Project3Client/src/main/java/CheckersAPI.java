@@ -118,11 +118,6 @@ public class CheckersAPI {
                 myColor = "RED";
                 player2Name.setText(msg.getActiveUsers().get(1));
                 opponentName = msg.getActiveUsers().get(1);
-                String temp = myName + " Wins: " + winDrawLoss.get(myName).wins + " Draws: " + winDrawLoss.get(myName).draws + " Loss: " + winDrawLoss.get(myName).losses;
-                player1WinDrawLoss.setText(temp);
-                temp = opponentName + " Wins: " + winDrawLoss.get(opponentName).wins + " Draws: " + winDrawLoss.get(opponentName).draws + " Loss: " + winDrawLoss.get(opponentName).losses;
-                player2WinDrawLoss.setText(temp);
-
                 for(int r = 0; r < 8;++r){
                     for(int c = 0; c < 8;++c){
                         if((r + c) % 2 == 0){
@@ -140,11 +135,11 @@ public class CheckersAPI {
                         }
                     }
                 }
-                return;
             }
             else{
                 myColor = "WHITE";
                 player2Name.setText(msg.getActiveUsers().get(0));
+                opponentName = msg.getActiveUsers().get(0);
                 for(int r = 0; r < 8;++r){
                     for(int c = 0; c < 8;++c){
                         if((r + c) % 2 == 0){
@@ -164,6 +159,10 @@ public class CheckersAPI {
                     }
                 }
             }
+            String temp = myName + " Wins: " + winDrawLoss.get(myName).wins + " Draws: " + winDrawLoss.get(myName).draws + " Loss: " + winDrawLoss.get(myName).losses;
+            player1WinDrawLoss.setText(temp);
+            temp = opponentName + " Wins: " + winDrawLoss.get(opponentName).wins + " Draws: " + winDrawLoss.get(opponentName).draws + " Loss: " + winDrawLoss.get(opponentName).losses;
+            player2WinDrawLoss.setText(temp);
         }
         else if(msg.msgType() == Message.messageType.CHECKERMOVE){
             if(msg.returnMessage() != null){
@@ -234,6 +233,8 @@ public class CheckersAPI {
         else if (msg.msgType() == Message.messageType.SCORES){
             //HashMap<String, Message.MyWinDrawLoss> scores = msg.getWinDrawLoss();
             winDrawLoss = msg.getWinDrawLoss();
+            String temp = myName + " Wins: " + winDrawLoss.get(myName).wins + " Draws: " + winDrawLoss.get(myName).draws + " Loss: " + winDrawLoss.get(myName).losses;
+            player1WinDrawLoss.setText(temp);
         }
         else {
             chatList.getItems().add(msg.returnMessage());
