@@ -42,7 +42,8 @@ public class CheckersAPI {
     private String opponentName;
     private Checkersquare selectedSquare = null;
     private String myColor = "";
-    private HashMap<String, Message.MyWinDrawLoss> winDrawLoss;
+    private Message.MyWinDrawLoss winDrawLoss;
+    private Message.MyWinDrawLoss opponentWinDrawLoss;
 
     public void setClient(Client client) {
         this.client = client;
@@ -80,6 +81,7 @@ public class CheckersAPI {
 
     public void handleServerMessage(Object data) {
         Message msg = (Message) data;
+        Platform.runLater(() -> {
         if (msg.msgType() == Message.messageType.USERNAME) {
             if(Objects.equals(msg.returnMessage(), "")){
                 erroruser.setVisible(true);
@@ -92,12 +94,12 @@ public class CheckersAPI {
 
                     CheckersAPI controller = loader.getController();
 
+                    client.setController(controller);
+
                     controller.myName = this.myName;
                     controller.setClient(client);
                     controller.setStage(stage);
 
-
-                    client.setController(controller);
                     controller.buildBoard();
 
 
@@ -159,10 +161,6 @@ public class CheckersAPI {
                     }
                 }
             }
-            String temp = myName + " Wins: " + winDrawLoss.get(myName).wins + " Draws: " + winDrawLoss.get(myName).draws + " Loss: " + winDrawLoss.get(myName).losses;
-            player1WinDrawLoss.setText(temp);
-            temp = opponentName + " Wins: " + winDrawLoss.get(opponentName).wins + " Draws: " + winDrawLoss.get(opponentName).draws + " Loss: " + winDrawLoss.get(opponentName).losses;
-            player2WinDrawLoss.setText(temp);
         }
         else if(msg.msgType() == Message.messageType.CHECKERMOVE){
             if(msg.returnMessage() != null){
@@ -232,14 +230,22 @@ public class CheckersAPI {
         }
         else if (msg.msgType() == Message.messageType.SCORES){
             //HashMap<String, Message.MyWinDrawLoss> scores = msg.getWinDrawLoss();
-            winDrawLoss = msg.getWinDrawLoss();
-            String temp = myName + " Wins: " + winDrawLoss.get(myName).wins + " Draws: " + winDrawLoss.get(myName).draws + " Loss: " + winDrawLoss.get(myName).losses;
-            player1WinDrawLoss.setText(temp);
+            if(!Objects.equals(msg.returnMessage(), "OPPONENT")) {
+                winDrawLoss = msg.getWinDrawLoss();
+                String temp = myName + " Wins: " + winDrawLoss.wins + " Draws: " + winDrawLoss.draws + " Loss: " + winDrawLoss.losses;
+                player1WinDrawLoss.setText(temp);
+            }
+            else{
+                opponentWinDrawLoss = msg.getWinDrawLoss();
+                String temp = opponentName + " Wins: " + opponentWinDrawLoss.wins + " Draws: " + opponentWinDrawLoss.draws + " Loss: " + opponentWinDrawLoss.losses;
+                player2WinDrawLoss.setText(temp);
+            }
+            System.out.println(msg.getWinDrawLoss().wins + " " + msg.getWinDrawLoss().draws + " " + msg.getWinDrawLoss().losses);
         }
         else {
             chatList.getItems().add(msg.returnMessage());
         }
-
+        });
     }
     @FXML
     private void sendButtonHandler(ActionEvent event) {

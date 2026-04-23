@@ -1,6 +1,6 @@
 test test 0 0 0
-as as 0 0 0
-da da 0 0 0
+as as 1 9 4
+da da 5 12 6
 Another test 0 0 0
 besian majmuni 0 0 0
 kapa kupa 0 0 0

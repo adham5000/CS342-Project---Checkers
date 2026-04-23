@@ -16,9 +16,9 @@ public class Message implements Serializable {
 
     public static class MyWinDrawLoss implements Serializable {
         private static final long serialVersionUID = 1L;
-        public final int wins;
-        public final int draws;
-        public final int losses;
+        public int wins;
+        public int draws;
+        public int losses;
 
         public MyWinDrawLoss(int wins, int draws, int losses) {
             this.wins = wins;
@@ -38,7 +38,7 @@ public class Message implements Serializable {
     private int capturedCol;
     private int kingRow;
     private int kingCol;
-    private HashMap<String, MyWinDrawLoss> winDrawLoss;
+    private MyWinDrawLoss winDrawLoss;
 
     public Message(String stringMessage) {
         this.stringMessage = stringMessage;
@@ -50,11 +50,15 @@ public class Message implements Serializable {
         this.type = type;
     }
 
-    public Message(HashMap<String, MyWinDrawLoss>  scores, messageType type) {
+    public Message(MyWinDrawLoss scores, messageType type) {
         this.winDrawLoss = scores;
         this.type = type;
     }
-
+    public Message(String stringMessage, MyWinDrawLoss scores, messageType type) {
+        this.stringMessage = stringMessage;
+        this.winDrawLoss = scores;
+        this.type = type;
+    }
     public Message(String stringMessage, messageType type, ArrayList<String> Users) {
         this.stringMessage = stringMessage;
         this.type = type;
@@ -120,7 +124,7 @@ public class Message implements Serializable {
     public String returnMessage() {return stringMessage;}
     public messageType msgType() {return type;}
     public ArrayList<String> getActiveUsers() { return Users; }
-    public HashMap<String, MyWinDrawLoss> getWinDrawLoss() {return winDrawLoss;}
+    public MyWinDrawLoss getWinDrawLoss() {return winDrawLoss;}
 
     static final long serialVersionUID = 42L;
 

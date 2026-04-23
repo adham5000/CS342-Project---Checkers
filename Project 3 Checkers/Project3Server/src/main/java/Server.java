@@ -90,6 +90,7 @@ public class Server {
 		Message msg;
 		private GameSession game;
 		private int playerColor;
+		Message.MyWinDrawLoss clientScore;
 
 		ClientThread(Socket s, int count){
 			this.connection = s;
@@ -156,11 +157,12 @@ public class Server {
 							Message.MyWinDrawLoss newScore = new Message.MyWinDrawLoss(0, 0, 0);
 							userScores.put(data.getActiveUsers().get(0), newScore);
 							msg = new Message("client: " + count + " name set: " + data.getActiveUsers().get(0));
-							//updateClients(msg);
+							clientScore = newScore;
 							callback.accept(msg);
 							msg = new Message(data.getActiveUsers().get(0),Message.messageType.USERNAME);
 							out.writeObject(msg);
-							msg = new Message(userScores, Message.messageType.SCORES);
+							msg = new Message(clientScore, Message.messageType.SCORES);
+
 							out.writeObject(msg);
 							ArrayList<String> tempList = new ArrayList<>(userNames.values());
 							msg = new Message(tempList, Message.messageType.USERLOG);
@@ -174,7 +176,8 @@ public class Server {
 							callback.accept(msg);
 							msg = new Message(data.getActiveUsers().get(0),Message.messageType.USERNAME);
 							out.writeObject(msg);
-							msg = new Message(userScores, Message.messageType.SCORES);
+							clientScore = userScores.get(data.getActiveUsers().get(0));
+							msg = new Message(clientScore, Message.messageType.SCORES);
 							out.writeObject(msg);
 							ArrayList<String> tempList = new ArrayList<>(userNames.values());
 							msg = new Message(tempList, Message.messageType.USERLOG);
@@ -218,6 +221,25 @@ public class Server {
 									}
 								}
 								if(game.whiteLost()){
+									game.getWhitePlayer().clientScore.losses++;
+									game.getRedPlayer().clientScore.wins++;
+
+									out.reset();
+									msg = new Message(clientScore,Message.messageType.SCORES);
+									out.writeObject(msg);
+
+									out.reset();
+									msg = new Message("OPPONENT",game.getOpponent(this).clientScore,Message.messageType.SCORES);
+									out.writeObject(msg);
+
+									game.getOpponent(this).out.reset();
+									msg = new Message(game.getOpponent(this).clientScore,Message.messageType.SCORES);
+									game.getOpponent(this).out.writeObject(msg);
+
+									game.getOpponent(this).out.reset();
+									msg = new Message("OPPONENT",clientScore,Message.messageType.SCORES);
+									game.getOpponent(this).out.writeObject(msg);
+
 									msg = new Message("RED WON", Message.messageType.GAME_OVER);
 									game.getWhitePlayer().out.writeObject(msg);
 									msg = new Message("YOU WON", Message.messageType.GAME_OVER);
@@ -225,7 +247,26 @@ public class Server {
 									activeGames.remove(game);
 									game = null;
 								}
-								if(game.redLost() && game != null){
+								if(game != null && game.redLost()){
+									game.getRedPlayer().clientScore.losses++;
+									game.getWhitePlayer().clientScore.wins++;
+
+									out.reset();
+									msg = new Message(clientScore,Message.messageType.SCORES);
+									out.writeObject(msg);
+
+									out.reset();
+									msg = new Message("OPPONENT",game.getOpponent(this).clientScore,Message.messageType.SCORES);
+									out.writeObject(msg);
+
+									game.getOpponent(this).out.reset();
+									msg = new Message(game.getOpponent(this).clientScore,Message.messageType.SCORES);
+									game.getOpponent(this).out.writeObject(msg);
+
+									game.getOpponent(this).out.reset();
+									msg = new Message("OPPONENT",clientScore,Message.messageType.SCORES);
+									game.getOpponent(this).out.writeObject(msg);
+
 									msg = new Message("WHITE WON", Message.messageType.GAME_OVER);
 									game.getRedPlayer().out.writeObject(msg);
 									msg = new Message("YOU WON", Message.messageType.GAME_OVER);
@@ -233,7 +274,26 @@ public class Server {
 									activeGames.remove(game);
 									game = null;
 								}
-								if(game.movesWithoutCap == 40 && game != null){
+								if(game != null && game.movesWithoutCap == 40){
+									game.getRedPlayer().clientScore.draws++;
+									game.getWhitePlayer().clientScore.draws++;
+
+									out.reset();
+									msg = new Message(clientScore,Message.messageType.SCORES);
+									out.writeObject(msg);
+
+									out.reset();
+									msg = new Message("OPPONENT",game.getOpponent(this).clientScore,Message.messageType.SCORES);
+									out.writeObject(msg);
+
+									game.getOpponent(this).out.reset();
+									msg = new Message(game.getOpponent(this).clientScore,Message.messageType.SCORES);
+									game.getOpponent(this).out.writeObject(msg);
+
+									game.getOpponent(this).out.reset();
+									msg = new Message("OPPONENT",clientScore,Message.messageType.SCORES);
+									game.getOpponent(this).out.writeObject(msg);
+
 									msg = new Message("DRAW", Message.messageType.GAME_OVER);
 									game.getWhitePlayer().out.writeObject(msg);
 									game.getRedPlayer().out.writeObject(msg);
@@ -251,9 +311,30 @@ public class Server {
 							game.player2draw = true;
 						}
 						if(game.player1draw && game.player2draw){
+							game.getRedPlayer().clientScore.draws++;
+							game.getWhitePlayer().clientScore.draws++;
+							System.out.println(clientScore.draws + " " + game.getOpponent(this).clientScore.draws);
+
+							out.reset();
+							msg = new Message(clientScore,Message.messageType.SCORES);
+							out.writeObject(msg);
+
+							out.reset();
+							msg = new Message("OPPONENT",game.getOpponent(this).clientScore,Message.messageType.SCORES);
+							out.writeObject(msg);
+
+							game.getOpponent(this).out.reset();
+							msg = new Message(game.getOpponent(this).clientScore,Message.messageType.SCORES);
+							game.getOpponent(this).out.writeObject(msg);
+
+							game.getOpponent(this).out.reset();
+							msg = new Message("OPPONENT",clientScore,Message.messageType.SCORES);
+							game.getOpponent(this).out.writeObject(msg);
+
 							msg = new Message("DRAW", Message.messageType.GAME_OVER);
 							out.writeObject(msg);
 							game.getOpponent(this).out.writeObject(msg);
+
 							activeGames.remove(game);
 							game = null;
 						}
@@ -272,6 +353,26 @@ public class Server {
 					e.printStackTrace();
 					msg = new Message("OOOOPPs...Something wrong with the socket from client: " + count + "....closing down!");
 					callback.accept(msg);
+
+					try {
+						List<String> lines = Files.readAllLines(Path.of("info.txt"));
+
+						for (int i = 0; i < lines.size(); i++) {
+							String[] p = lines.get(i).split(" ");
+							if (p[0].equals(userNames.get(count))) {
+								p[2] = String.valueOf(clientScore.wins);
+								p[3] = String.valueOf(clientScore.draws);
+								p[4] = String.valueOf(clientScore.losses);
+								lines.set(i, String.join(" ", p));
+								break;
+							}
+						}
+
+						Files.write(Path.of("info.txt"), lines);
+					}
+					catch(Exception e1) {
+						e1.printStackTrace();
+					}
 
 					msg = new Message("Client #" + count + " has left the server!");
 					updateClients(msg);
@@ -311,12 +412,13 @@ public class Server {
 		names.add(userNames.get(p2.count));
 		Message msg;
 		try {
-			msg = new Message(userScores, Message.messageType.SCORES);
-			p1.out.writeObject(msg);
-			p2.out.writeObject(msg);
 			msg = new Message("RED",Message.messageType.GAME_START, names);
 			p1.out.writeObject(msg);
 			msg = new Message("WHITE", Message.messageType.GAME_START, names);
+			p2.out.writeObject(msg);
+			msg = new Message("OPPONENT",p2.clientScore, Message.messageType.SCORES);
+			p1.out.writeObject(msg);
+			msg = new Message("OPPONENT",p1.clientScore, Message.messageType.SCORES);
 			p2.out.writeObject(msg);
 		}
 		catch(Exception e) {
