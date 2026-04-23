@@ -20,6 +20,8 @@ public class Server {
 	HashMap<String, Message.MyWinDrawLoss> userScores = new HashMap<>();
 	private final Queue<ClientThread> waitList = new LinkedList<>();
 	private final ArrayList<GameSession> activeGames = new ArrayList<>();
+	HashMap<String,HashSet<String>> friendsMap = new HashMap<>();
+	HashMap<String,HashSet<String>> pendingRequests = new HashMap<>();
 //	public class MyWinDrawLoss{
 //		public final int wins;
 //		public final int draws;
@@ -51,7 +53,29 @@ public class Server {
 			userInfo.put(name,password);
 			sc.nextLine();
 		}
+		sc.close();
+		try {
+			sc = new Scanner(new File("users.txt"));
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		while (sc.hasNextLine()) {
+			String line = sc.nextLine().trim();
+			if (line.isEmpty()) continue;
 
+			Scanner lineScanner = new Scanner(line);
+
+			String username = lineScanner.next();
+			HashSet<String> friendSet = new HashSet<>();
+
+			while (lineScanner.hasNext()) {
+				friendSet.add(lineScanner.next());
+			}
+
+			friendsMap.put(username, friendSet);
+			lineScanner.close();
+		}
 		callback = call;
 		server = new TheServer();
 		server.start();
@@ -168,6 +192,11 @@ public class Server {
 							msg = new Message(tempList, Message.messageType.USERLOG);
 							updateClients(msg);
 							callback.accept(msg);
+
+							HashSet<String> friends = new HashSet<>();
+							friendsMap.put(data.getActiveUsers().get(0), friends);
+							msg = new Message(friends);
+							out.writeObject(msg);
 						}
 						else if(userInfo.containsKey(data.getActiveUsers().get(0)) && userInfo.get(data.getActiveUsers().get(0)).equals(data.getActiveUsers().get(1))){
 							userNames.put(count, data.getActiveUsers().get(0));
@@ -183,6 +212,16 @@ public class Server {
 							msg = new Message(tempList, Message.messageType.USERLOG);
 							updateClients(msg);
 							callback.accept(msg);
+
+							if(friendsMap.get(data.getActiveUsers().get(0)) == null){
+								HashSet<String> friends = new HashSet<>();
+								friendsMap.put(data.getActiveUsers().get(0), friends);
+							}
+							HashSet<String> temp = friendsMap.get(data.getActiveUsers().get(0));
+
+							msg = new Message(temp);
+							out.writeObject(msg);
+
 						}
 						else {
 							msg = new Message("", Message.messageType.USERNAME);
@@ -343,6 +382,45 @@ public class Server {
 							game.getOpponent(this).out.writeObject(msg);
 						}
 					}
+					else if (data.msgType() == Message.messageType.FRIEND_REQUEST) {
+
+						String sender = userNames.get(count);
+						String target = data.returnMessage();
+
+						// Already friends?
+						if (friendsMap.get(sender).contains(target)) return;
+
+						// Ensure both users have pending lists
+						pendingRequests.putIfAbsent(sender, new HashSet<>());
+						pendingRequests.putIfAbsent(target, new HashSet<>());
+
+						// If target already requested sender → auto-friend
+						if (pendingRequests.get(sender).contains(target)) {
+							System.out.println(userNames.get(count) + " " + sender + " " + target);
+							friendsMap.get(sender).add(target);
+							friendsMap.get(target).add(sender);
+
+							// Send updated lists
+							out.writeObject(new Message(friendsMap.get(sender)));
+
+							for (ClientThread c : clients) {
+								if (Objects.equals(userNames.get(c.count), target)) {
+									c.out.writeObject(new Message(friendsMap.get(target)));
+								}
+							}
+						}
+						else {
+							// Store sender → target request
+							pendingRequests.get(target).add(sender);
+
+							// Notify target with a simple message (your client expects this)
+							for (ClientThread c : clients) {
+								if (Objects.equals(userNames.get(c.count), target)) {
+									c.out.writeObject(new Message(sender + " requested to be your friend"));
+								}
+							}
+						}
+					}
 					else if(data.msgType() == Message.messageType.GLOBAL && game!=null){
 						msg = new Message("user: " + userNames.get(count) + ": " + data.returnMessage());
 						game.getOpponent(this).out.writeObject(msg);
@@ -373,7 +451,23 @@ public class Server {
 					catch(Exception e1) {
 						e1.printStackTrace();
 					}
+					try {
+						List<String> lines = Files.readAllLines(Path.of("users.txt"));
 
+						for (int i = 0; i < lines.size(); i++) {
+							String[] p = lines.get(i).split(" ");
+							if (p[0].equals(userNames.get(count))) {
+								String friends = String.join(" ", friendsMap.get(userNames.get(count)));
+								lines.set(i, p[0] + " " + friends);
+								break;
+							}
+						}
+
+						Files.write(Path.of("users.txt"), lines);
+					}
+					catch(Exception e1) {
+						e1.printStackTrace();
+					}
 					msg = new Message("Client #" + count + " has left the server!");
 					updateClients(msg);
 

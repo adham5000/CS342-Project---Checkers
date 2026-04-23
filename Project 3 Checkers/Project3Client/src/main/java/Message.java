@@ -1,6 +1,7 @@
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 
 public class Message implements Serializable {
     public enum messageType {
@@ -12,6 +13,8 @@ public class Message implements Serializable {
         GAME_START,
         GAME_OVER,
         SCORES,
+        FRIENDS,
+        FRIEND_REQUEST,
     }
 
     public static class MyWinDrawLoss implements Serializable {
@@ -39,12 +42,16 @@ public class Message implements Serializable {
     private int kingRow;
     private int kingCol;
     private MyWinDrawLoss winDrawLoss;
+    private HashSet<String> friends;
 
     public Message(String stringMessage) {
         this.stringMessage = stringMessage;
         this.type = messageType.GLOBAL;
     }
-
+    public Message(HashSet<String> friends) {
+        this.friends = friends;
+        this.type = messageType.FRIENDS;
+    }
     public Message(String stringMessage, messageType type) {
         this.stringMessage = stringMessage;
         this.type = type;
@@ -121,6 +128,7 @@ public class Message implements Serializable {
     public int getCapturedCol() {
         return capturedCol;
     }
+    public HashSet<String> getFriends() {return friends;}
     public String returnMessage() {return stringMessage;}
     public messageType msgType() {return type;}
     public ArrayList<String> getActiveUsers() { return Users; }

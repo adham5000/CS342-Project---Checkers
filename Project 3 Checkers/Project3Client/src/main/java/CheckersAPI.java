@@ -9,10 +9,7 @@ import javafx.scene.layout.GridPane;
 import javafx.event.ActionEvent;
 import javafx.stage.Stage;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Objects;
+import java.util.*;
 
 public class CheckersAPI {
     @FXML public ToggleGroup gameType;
@@ -20,10 +17,10 @@ public class CheckersAPI {
     @FXML private ListView<String> chatList;
     @FXML private ListView<String> listUsers;
     @FXML private ListView<String> listMoves;
-    @FXML private TextField chatInput;
+    @FXML private TextField friendField;
     @FXML private TextField passfield;
     @FXML private TextField userfield;
-    @FXML private Button setUserName;
+    @FXML private Button friendBtn;
     @FXML private Button startGameBtn;
     @FXML private Button drawBtn;
     @FXML private Button sendBtn;
@@ -44,6 +41,7 @@ public class CheckersAPI {
     private String myColor = "";
     private Message.MyWinDrawLoss winDrawLoss;
     private Message.MyWinDrawLoss opponentWinDrawLoss;
+    private HashSet<String> friends = new HashSet<>();
 
     public void setClient(Client client) {
         this.client = client;
@@ -53,6 +51,7 @@ public class CheckersAPI {
     }
     @FXML
     public void initialize() {}
+
 
     private void buildBoard() {
 
@@ -101,7 +100,6 @@ public class CheckersAPI {
                     controller.setStage(stage);
 
                     controller.buildBoard();
-
 
                     stage.setScene(new Scene(root));
                 }
@@ -230,6 +228,9 @@ public class CheckersAPI {
         }
         else if (msg.msgType() == Message.messageType.SCORES){
             //HashMap<String, Message.MyWinDrawLoss> scores = msg.getWinDrawLoss();
+            if (player1WinDrawLoss == null || player2WinDrawLoss == null) {
+                return;
+            }
             if(!Objects.equals(msg.returnMessage(), "OPPONENT")) {
                 winDrawLoss = msg.getWinDrawLoss();
                 String temp = myName + " Wins: " + winDrawLoss.wins + " Draws: " + winDrawLoss.draws + " Loss: " + winDrawLoss.losses;
@@ -241,6 +242,9 @@ public class CheckersAPI {
                 player2WinDrawLoss.setText(temp);
             }
             System.out.println(msg.getWinDrawLoss().wins + " " + msg.getWinDrawLoss().draws + " " + msg.getWinDrawLoss().losses);
+        }
+        else if (msg.msgType() == Message.messageType.FRIENDS){
+            setFriends(msg.getFriends());
         }
         else {
             chatList.getItems().add(msg.returnMessage());
@@ -296,6 +300,7 @@ public class CheckersAPI {
        // passfield.clear();
     }
     @FXML void handleRandomGame(ActionEvent event) {
+        friends.add("as");
         Message message = new Message(Message.messageType.GAME_START);
         client.send(message);
     }
@@ -304,5 +309,47 @@ public class CheckersAPI {
         Message msg = new Message("DRAW", Message.messageType.GAME_OVER);
         drawBtn.setDisable(true);
         client.send(msg);
+    }
+    public void setFriends(HashSet<String> newFriends) {
+        // Update the existing set instead of replacing the reference
+        this.friends.clear();
+        this.friends.addAll(newFriends);
+
+        // Only set the cell factory once
+        if (listUsers.getCellFactory() == null) {
+            listUsers.setCellFactory(lv -> new ListCell<String>() {
+                @Override
+                protected void updateItem(String item, boolean empty) {
+                    super.updateItem(item, empty);
+
+                    if (empty || item == null) {
+                        setText(null);
+                        setStyle("");
+                        return;
+                    }
+
+                    setText(item);
+
+                    // Use the FIELD, not a captured parameter
+                    if (CheckersAPI.this.friends.contains(item)) {
+                        setStyle("-fx-background-color: lightgreen; -fx-font-weight: bold;");
+                    } else {
+                        setStyle("");
+                    }
+                }
+            });
+        }
+
+        listUsers.refresh();
+    }
+
+    @FXML
+    public void friendBtnHandler(ActionEvent event) {
+        Message msg;
+        String friend = friendField.getText();
+        if(listUsers.getItems().contains(friend) && !friends.contains(friend)){
+            msg = new Message(friend, Message.messageType.FRIEND_REQUEST);
+            client.send(msg);
+        }
     }
 }
