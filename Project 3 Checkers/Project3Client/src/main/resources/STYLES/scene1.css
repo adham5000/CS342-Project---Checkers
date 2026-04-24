@@ -14,7 +14,6 @@
 }
 
 .defaultLabel{
-    /*-fx-font-family: "Segoe UI Semibold";*/
     -fx-font-size: 14px;
     -fx-font-weight: bold;
 }
@@ -54,7 +53,7 @@
     -fx-background-color: #FFFFFF;
 }
 .list-cell.highlighted {
-    -fx-background-color: burlywood;   /* or any color you want */
+    -fx-background-color: burlywood;
     -fx-text-fill: black;
 }
 .scoreLabel {

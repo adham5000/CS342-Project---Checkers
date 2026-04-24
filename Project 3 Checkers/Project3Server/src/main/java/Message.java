@@ -9,18 +9,18 @@ public class Message implements Serializable {
         GLOBAL,         // For chat log
         USERLOG,        // For showing usernames
         CHECKERMOVE,    // For moves
-        GAME_START,
-        GAME_OVER,
-        SCORES,
-        FRIENDS,
-        FRIEND_REQUEST,
-        RESIGN,
-        ACK,
-        QUIT,
-        REMATCH,
-        REGISTER,
-        ERROR,
-        CHALLENGE,
+        GAME_START,     // For starting checkerboard
+        GAME_OVER,      // For ending a match
+        SCORES,         // For saving scores
+        FRIENDS,        // For creating friends
+        FRIEND_REQUEST, // For sending friend request
+        RESIGN,         // For quiting the match early
+        ACK,            // For fixing race conditions
+        QUIT,           // For not doing a rematch
+        REMATCH,        // For rematch
+        REGISTER,       // For creating account
+        ERROR,          // For error messages
+        CHALLENGE,      // For challenging a friend
     }
 
     public static class MyWinDrawLoss implements Serializable {

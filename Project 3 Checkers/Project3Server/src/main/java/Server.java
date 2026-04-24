@@ -10,7 +10,6 @@ import java.util.function.Consumer;
 import java.util.LinkedList;
 
 public class Server {
-
 	int count = 1;
 	ArrayList<ClientThread> clients = new ArrayList<ClientThread>();
 	TheServer server;
@@ -164,7 +163,6 @@ public class Server {
 						if(userInfo.containsKey(data.getActiveUsers().get(0)) && userInfo.get(data.getActiveUsers().get(0)).equals(data.getActiveUsers().get(1)) && !userNames.containsValue(data.getActiveUsers().get(0))){
 							userNames.put(count, data.getActiveUsers().get(0));
 							msg = new Message("client: " + count + " name set: " + data.getActiveUsers().get(0));
-							//updateClients(msg);
 							callback.accept(msg);
 							msg = new Message(data.getActiveUsers().get(0),Message.messageType.USERNAME);
 							out.writeObject(msg);
@@ -626,7 +624,7 @@ public class Server {
 					}
 					String disconnectedUser = userNames.get(count);
 
-// Update all users who had THIS user as a friend
+					// Update all users who had THIS user as a friend
 					userNames.remove(count);
 					for (ClientThread c : clients) {
 						String other = userNames.get(c.count);
@@ -1057,5 +1055,4 @@ public class Server {
 			return true;
 		}
 	}
-
 }

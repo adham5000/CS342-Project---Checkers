@@ -102,64 +102,63 @@ public class CheckersAPI {
         Message msg = (Message) data;
         Platform.runLater(() -> {
         if (msg.msgType() == Message.messageType.USERNAME) {
-                myName = msg.returnMessage();
-                try {
-                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/FXML/checkersMulti.fxml"));
-                    Parent root = loader.load();
+            myName = msg.returnMessage();
+            try {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/FXML/checkersMulti.fxml"));
+                Parent root = loader.load();
 
-                    CheckersAPI controller = loader.getController();
+                CheckersAPI controller = loader.getController();
 
-                    client.setController(controller);
+                client.setController(controller);
 
-                    controller.myName = this.myName;
-                    controller.setClient(client);
-                    controller.setStage(stage);
+                controller.myName = this.myName;
+                controller.setClient(client);
+                controller.setStage(stage);
 
-                    controller.buildBoard();
-                    Scene scene = new Scene(root);
-                    scene.getStylesheets().add(
-                            getClass().getResource("/STYLES/scene1.css").toExternalForm()
-                    );
-                    stage.setScene(scene);
-                    controller.listFriends.setCellFactory(list -> new ListCell<String>() {
+                controller.buildBoard();
+                Scene scene = new Scene(root);
+                scene.getStylesheets().add(
+                        getClass().getResource("/STYLES/scene1.css").toExternalForm()
+                );
+                stage.setScene(scene);
+                controller.listFriends.setCellFactory(list -> new ListCell<String>() {
 
-                        @Override
-                        protected void updateItem(String item, boolean empty) {
-                            super.updateItem(item, empty);
+                    @Override
+                    protected void updateItem(String item, boolean empty) {
+                        super.updateItem(item, empty);
 
-                            if (empty || item == null) {
-                                setText(null);
-                                getStyleClass().remove("highlighted");
-                            } else {
-                                setText(item);
+                        if (empty || item == null) {
+                            setText(null);
+                            getStyleClass().remove("highlighted");
+                        } else {
+                            setText(item);
 
-                                // highlight if selected
-                                if (item.equals(controller.listFriends.getSelectionModel().getSelectedItem())) {
-                                    if (!getStyleClass().contains("highlighted")) {
-                                        getStyleClass().add("highlighted");
-                                    }
-                                } else {
-                                    getStyleClass().remove("highlighted");
+                            // highlight if selected
+                            if (item.equals(controller.listFriends.getSelectionModel().getSelectedItem())) {
+                                if (!getStyleClass().contains("highlighted")) {
+                                    getStyleClass().add("highlighted");
                                 }
+                            } else {
+                                getStyleClass().remove("highlighted");
                             }
                         }
-                    });
-                    controller.listFriends.setOnMouseClicked(event -> {
-                        controller.listFriends.refresh();
-                        String selected = controller.listFriends.getSelectionModel().getSelectedItem();
-                        if (selected != null) {
-                            controller.challengeField.setText(selected);
+                    }
+                });
+                controller.listFriends.setOnMouseClicked(event -> {
+                    controller.listFriends.refresh();
+                    String selected = controller.listFriends.getSelectionModel().getSelectedItem();
+                    if (selected != null) {
+                        controller.challengeField.setText(selected);
 
-                        }
-                    });
-                    Message message = new Message(Message.messageType.ACK);
-                    client.send(message);
-                }
-                catch(Exception e){
-                    e.printStackTrace();
-                }
+                    }
+                });
+                Message message = new Message(Message.messageType.ACK);
+                client.send(message);
             }
-        //}
+            catch(Exception e){
+                e.printStackTrace();
+            }
+        }
         else if(msg.msgType() == Message.messageType.ERROR){
             erroruser.setVisible(true);
             erroruser.setText(msg.returnMessage());
