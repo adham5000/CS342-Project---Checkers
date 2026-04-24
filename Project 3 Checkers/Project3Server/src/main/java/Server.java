@@ -22,17 +22,6 @@ public class Server {
 	private final ArrayList<GameSession> activeGames = new ArrayList<>();
 	HashMap<String,HashSet<String>> friendsMap = new HashMap<>();
 	HashMap<String,HashSet<String>> pendingRequests = new HashMap<>();
-//	public class MyWinDrawLoss{
-//		public final int wins;
-//		public final int draws;
-//		public final int losses;
-//
-//		public MyWinDrawLoss(int wins, int draws, int losses) {
-//			this.wins = wins;
-//			this.draws = draws;
-//			this.losses = losses;
-//		}
-//	}
 	Scanner sc;
 	Server(Consumer<Serializable> call){
 
@@ -180,6 +169,11 @@ public class Server {
 							userInfo.put(data.getActiveUsers().get(0),data.getActiveUsers().get(1));
 							Message.MyWinDrawLoss newScore = new Message.MyWinDrawLoss(0, 0, 0);
 							userScores.put(data.getActiveUsers().get(0), newScore);
+							Files.write(
+									Path.of("users.txt"),
+									(data.getActiveUsers().get(0) + "\n").getBytes(),
+									StandardOpenOption.APPEND
+							);
 							msg = new Message("client: " + count + " name set: " + data.getActiveUsers().get(0));
 							clientScore = newScore;
 							callback.accept(msg);

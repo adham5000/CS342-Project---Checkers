@@ -227,7 +227,6 @@ public class CheckersAPI {
             drawBtn.setDisable(true);
         }
         else if (msg.msgType() == Message.messageType.SCORES){
-            //HashMap<String, Message.MyWinDrawLoss> scores = msg.getWinDrawLoss();
             if (player1WinDrawLoss == null || player2WinDrawLoss == null) {
                 return;
             }
