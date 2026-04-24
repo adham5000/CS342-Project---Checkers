@@ -24,19 +24,19 @@
 }
 
 .defaultButton{
-    -fx-font-size: 14px;
+    -fx-font-size: 11px;
     -fx-font-weight: bold;
     -fx-background-color: #84b7f1;
 }
 
 .defaultButton:hover{
-    -fx-font-size: 14px;
+    -fx-font-size: 11px;
     -fx-font-weight: bold;
     -fx-background-color: #5099f3;
 }
 
 .defaultButton:pressed{
-    -fx-font-size: 14px;
+    -fx-font-size: 11px;
     -fx-font-weight: bold;
     -fx-background-color: #a7caf4;
 }
@@ -59,4 +59,17 @@
 }
 .list-view .list-cell:even {
     -fx-background-color: #e0e0e0;
+}
+.scoreLabel {
+    -fx-font-family: "Segoe UI Semibold";
+    -fx-font-size: 18px;
+    -fx-text-fill: #1f3b5c;
+
+    -fx-background-color: #ffffffcc;
+    -fx-background-radius: 8;
+    -fx-padding: 6 12;
+
+    -fx-border-color: #d0d8e8;
+    -fx-border-radius: 8;
+    -fx-border-width: 1;
 }

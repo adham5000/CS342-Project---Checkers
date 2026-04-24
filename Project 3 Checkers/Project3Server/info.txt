@@ -1,9 +1,12 @@
 
-as as 10 5 19
-da da 17 5 13
+as as 11 5 21
+da da 19 5 14
 test test 0 0 0
 zotri zotri 0 0 0
 hamami hamami 0 0 0
 polo polo 0 0 1
 zj zj 0 0 0
 mj mj 0 0 0
+sa sa 0 0 0
+lok lok 1 0 1
+sss sss 0 0 1

@@ -11,40 +11,60 @@
             <VBox prefHeight="600.0" prefWidth="800.0" spacing="10.0" BorderPane.alignment="CENTER">
                <HBox prefHeight="470.0" prefWidth="780.0" spacing="10.0">
                   <VBox prefHeight="470.0" prefWidth="180.0">
-                     <Label text="Moves:" styleClass="defaultLabel"/>
+                     <Label styleClass="defaultLabel" text="Moves:" />
                      <ListView fx:id="listMoves" prefHeight="217.6" prefWidth="180.0" />
-                     <Label text="Chat:" styleClass="defaultLabel"/>
+                     <Label styleClass="defaultLabel" text="Chat:" />
                      <ListView fx:id="chatList" prefHeight="217.6" prefWidth="180.0" />
                   </VBox>
                   <VBox prefHeight="470.0" prefWidth="400.0" spacing="5.0">
-                     <Label fx:id="player2Name" text="Opponents Name" styleClass="defaultLabel"/>
+                     <Label fx:id="player2Name" styleClass="defaultLabel" text="Opponents Name" />
                      <GridPane fx:id="board" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" VBox.vgrow="ALWAYS" />
-                     <Label fx:id="player1Name" text="Your Name" styleClass="defaultLabel"/>
+                     <Label fx:id="player1Name" styleClass="defaultLabel" text="Your Name" />
                   </VBox>
                   <VBox prefHeight="470.0" prefWidth="180.0">
-                     <Label text="Users Online:" styleClass="defaultLabel"/>
+                     <Label styleClass="defaultLabel" text="Users Online:" />
                      <ListView fx:id="listUsers" prefHeight="217.6" prefWidth="180.0" />
-                     <Label text="Online Friends:" styleClass="defaultLabel"/>
+                     <Label styleClass="defaultLabel" text="Online Friends:" />
                      <ListView fx:id="listFriends" prefHeight="217.6" prefWidth="180.0" />
                   </VBox>
                </HBox>
-               <HBox prefHeight="100.0" prefWidth="780.0">
-                  <Button mnemonicParsing="false" onAction="#sendButtonHandler" text="Send" styleClass="defaultButton" />
-                  <TextField fx:id="sendField" styleClass="defaultTextField" />
-                  <Button fx:id="startGameBtn" mnemonicParsing="false" onAction="#handleRandomGame" text="start random game" styleClass="defaultButton"/>
-                  <Button fx:id="drawBtn" mnemonicParsing="false" onAction="#drawBtnHandler" prefHeight="25.0" prefWidth="102.0" text="request draw" styleClass="defaultButton"/>
-                  <Button fx:id="resignBtn" mnemonicParsing="false" onAction="#resignBtnHandler" prefHeight="25.0" prefWidth="62.0" text="Resign" styleClass="defaultButton"/>
-                  <Button fx:id="friendBtn" mnemonicParsing="false" onAction="#friendBtnHandler" text="Add Friend" styleClass="defaultButton">
-                     <HBox.margin>
-                        <Insets />
-                     </HBox.margin>
-                  </Button>
-                  <TextField fx:id="friendField" styleClass="defaultTextField"/>
+               <HBox prefHeight="100.0" prefWidth="780.0" spacing="420.0">
+                  <VBox prefHeight="64.0" prefWidth="180.0" spacing="10.0">
+                     <children>
+                        <HBox minWidth="180.0" prefHeight="25.0" prefWidth="200.0" spacing="5.0">
+                           <children>
+                              <Button mnemonicParsing="false" onAction="#sendButtonHandler" styleClass="defaultButton" text="Send" />
+                              <TextField fx:id="sendField" prefHeight="25.0" prefWidth="133.0" styleClass="defaultTextField" />
+                           </children>
+                        </HBox>
+                        <Button fx:id="startGameBtn" mnemonicParsing="false" onAction="#handleRandomGame" prefHeight="25.0" prefWidth="185.0" styleClass="defaultButton" text="start random game" />
+                     </children>
+                  </VBox>
+                  <VBox minWidth="180.0" prefHeight="25.0" prefWidth="180.0" spacing="10.0">
+                     <children>
+                        <HBox prefHeight="25.0" prefWidth="200.0" spacing="5.0">
+                           <children>
+                              <Button fx:id="friendBtn" mnemonicParsing="false" onAction="#friendBtnHandler" prefHeight="25.0" prefWidth="98.0" styleClass="defaultButton" text="Add Friend">
+                                 <HBox.margin>
+                                    <Insets />
+                                 </HBox.margin>
+                              </Button>
+                              <TextField fx:id="friendField" maxWidth="100.0" prefHeight="25.0" prefWidth="107.0" styleClass="defaultTextField" />
+                           </children>
+                        </HBox>
+                        <HBox prefHeight="100.0" prefWidth="200.0" spacing="5.0">
+                           <children>
+                              <Button fx:id="drawBtn" mnemonicParsing="false" onAction="#drawBtnHandler" prefHeight="25.0" prefWidth="89.0" styleClass="defaultButton" text="request draw" />
+                              <Button fx:id="resignBtn" mnemonicParsing="false" onAction="#resignBtnHandler" prefHeight="25.0" prefWidth="92.0" styleClass="defaultButton" text="Resign" />
+                           </children>
+                        </HBox>
+                     </children>
+                  </VBox>
                </HBox>
                <HBox prefHeight="100.0" prefWidth="200.0">
                   <children>
-                     <Label fx:id="player1WinDrawLoss" text="Player1 scores" styleClass="defaultLabel"/>
-                     <Label fx:id="player2WinDrawLoss" text="Player2 scores" styleClass="defaultLabel">
+                     <Label fx:id="player1WinDrawLoss" styleClass="scoreLabel" text="Player1 scores" />
+                     <Label fx:id="player2WinDrawLoss" styleClass="scoreLabel" text="Player2 scores">
                         <HBox.margin>
                            <Insets left="300.0" />
                         </HBox.margin>
@@ -54,14 +74,14 @@
             </VBox>
          </center>
       </BorderPane>
-      <StackPane fx:id="winPopup" alignment="CENTER" style="-fx-background-color: rgba(0,0,0,0.6);" visible="false" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0" pickOnBounds="true">
+      <StackPane fx:id="winPopup" alignment="CENTER" pickOnBounds="true" style="-fx-background-color: rgba(0,0,0,0.6);" visible="false" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0">
 
          <VBox maxHeight="400.0" maxWidth="300.0" spacing="20" style="-fx-background-color: white; -fx-padding: 30; -fx-background-radius: 10;">
             <Label fx:id="winMessage" style="-fx-font-size: 28px; -fx-font-weight: bold;" />
-            <Label fx:id ="rematchRequest"/>
+            <Label fx:id="rematchRequest" />
             <HBox>
-               <Button fx:id = "rematchBtn" onAction="#rematchBtnHandler" text="rematch" styleClass="defaultButton"/>
-               <Button fx:id = "quitBtn" text = "quit" onAction="#quitBtnHandler" styleClass="defaultButton"/>
+               <Button fx:id="rematchBtn" onAction="#rematchBtnHandler" styleClass="defaultButton" text="rematch" />
+               <Button fx:id="quitBtn" onAction="#quitBtnHandler" styleClass="defaultButton" text="quit" />
             </HBox>
          </VBox>
 
