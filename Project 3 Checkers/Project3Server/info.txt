@@ -1,6 +1,6 @@
 
-as as 11 5 21
-da da 19 5 14
+as as 18 5 30
+da da 25 5 19
 test test 0 0 0
 zotri zotri 0 0 0
 hamami hamami 0 0 0
@@ -10,3 +10,11 @@ mj mj 0 0 0
 sa sa 0 0 0
 lok lok 1 0 1
 sss sss 0 0 1
+asa asas 1 0 1
+sfd sdf 0 0 1
+wew qew 0 0 0
+lpol kij 0 0 0
+kkiki lkoko 0 0 1
+wrw wreer 1 0 1
+loko sdksjdn 1 0 1
+asdasda asdl 1 0 1

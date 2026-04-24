@@ -28,7 +28,7 @@
                      <ListView fx:id="listFriends" prefHeight="217.6" prefWidth="180.0" styleClass="list-cell"/>
                   </VBox>
                </HBox>
-               <HBox prefHeight="100.0" prefWidth="780.0" spacing="420.0">
+               <HBox prefHeight="100.0" prefWidth="780.0">
                   <VBox prefHeight="64.0" prefWidth="180.0" spacing="10.0">
                      <children>
                         <HBox minWidth="180.0" prefHeight="25.0" prefWidth="200.0" spacing="5.0">
@@ -40,6 +40,14 @@
                         <Button fx:id="startGameBtn" mnemonicParsing="false" onAction="#handleRandomGame" prefHeight="25.0" prefWidth="185.0" styleClass="defaultButton" text="start random game" />
                      </children>
                   </VBox>
+                  <Region HBox.hgrow="ALWAYS" />
+                  <VBox alignment="TOP_CENTER" prefHeight="64.0" prefWidth="360.0" spacing="10.0">
+                     <children>
+                        <Label fx:id="player1WinDrawLoss" styleClass="scoreLabel" text="Player1 scores" wrapText="true" />
+                        <Label fx:id="player2WinDrawLoss" styleClass="scoreLabel" text="Player2 scores" wrapText="true" />
+                     </children>
+                  </VBox>
+                  <Region HBox.hgrow="ALWAYS" />
                   <VBox minWidth="180.0" prefHeight="25.0" prefWidth="180.0" spacing="10.0">
                      <children>
                         <HBox prefHeight="25.0" prefWidth="200.0" spacing="5.0">
@@ -61,27 +69,19 @@
                      </children>
                   </VBox>
                </HBox>
-               <HBox prefHeight="100.0" prefWidth="200.0">
-                  <children>
-                     <Label fx:id="player1WinDrawLoss" styleClass="scoreLabel" text="Player1 scores" />
-                     <Label fx:id="player2WinDrawLoss" styleClass="scoreLabel" text="Player2 scores">
-                        <HBox.margin>
-                           <Insets left="300.0" />
-                        </HBox.margin>
-                     </Label>
-                  </children>
-               </HBox>
+               <HBox prefHeight="100.0" prefWidth="200.0" />
             </VBox>
          </center>
       </BorderPane>
       <StackPane fx:id="winPopup" alignment="CENTER" pickOnBounds="true" style="-fx-background-color: rgba(0,0,0,0.6);" visible="false" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0">
 
-         <VBox maxHeight="400.0" maxWidth="300.0" spacing="20" style="-fx-background-color: white; -fx-padding: 30; -fx-background-radius: 10;">
+         <VBox alignment="CENTER" maxHeight="400.0" maxWidth="300.0" spacing="20" style="-fx-background-color: bisque; -fx-padding: 30; -fx-background-radius: 10;">
             <Label fx:id="winMessage" style="-fx-font-size: 28px; -fx-font-weight: bold;" />
-            <Label fx:id="rematchRequest" />
-            <HBox>
-               <Button fx:id="rematchBtn" onAction="#rematchBtnHandler" styleClass="defaultButton" text="rematch" />
-               <Button fx:id="quitBtn" onAction="#quitBtnHandler" styleClass="defaultButton" text="quit" />
+            <Label fx:id="rematchRequest" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+            <HBox spacing="10.0">
+               <Button fx:id="rematchBtn" onAction="#rematchBtnHandler" prefWidth="100.0" styleClass="defaultButton" text="rematch" />
+               <Region HBox.hgrow="ALWAYS" />
+               <Button fx:id="quitBtn" onAction="#quitBtnHandler" prefWidth="100.0" styleClass="defaultButton" text="quit" />
             </HBox>
          </VBox>
 
