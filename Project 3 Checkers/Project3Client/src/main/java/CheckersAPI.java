@@ -338,10 +338,20 @@ public class CheckersAPI {
        // passfield.clear();
     }
     @FXML void handleRandomGame(ActionEvent event) {
-        friends.add("as");
         Message message = new Message(Message.messageType.GAME_START);
         client.send(message);
     }
+
+    @FXML
+    public void handleRegisterUser(ActionEvent event) {
+        ArrayList<String> namepass =  new ArrayList<>();
+        namepass.add(userfield.getText());
+        namepass.add(passfield.getText());
+
+        Message msg = new Message(namepass, Message.messageType.REGISTER);
+        client.send(msg);
+    }
+
 
     @FXML void drawBtnHandler(ActionEvent event) {
         Message msg = new Message("DRAW", Message.messageType.GAME_OVER);

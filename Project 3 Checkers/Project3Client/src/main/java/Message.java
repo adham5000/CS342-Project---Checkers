@@ -20,6 +20,7 @@ public class Message implements Serializable {
         ACK,
         QUIT,
         REMATCH,
+        REGISTER,
     }
 
     public static class MyWinDrawLoss implements Serializable {

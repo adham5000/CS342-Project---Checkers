@@ -159,45 +159,45 @@ public class Server {
 					Message data = (Message) in.readObject(); // This reads txt from client
 
 					if (data.msgType() == Message.messageType.USERNAME) {
-						if (!userInfo.containsKey(data.getActiveUsers().get(0)) && !Objects.equals(data.getActiveUsers().get(1), "")) {
-							userNames.put(count, data.getActiveUsers().get(0));
-
-							Files.write(
-									Path.of("info.txt"),
-									(data.getActiveUsers().get(0) + " " + data.getActiveUsers().get(1) + " 0 0 0" + "\n").getBytes(),
-									StandardOpenOption.APPEND
-							);
-							userInfo.put(data.getActiveUsers().get(0),data.getActiveUsers().get(1));
-							Message.MyWinDrawLoss newScore = new Message.MyWinDrawLoss(0, 0, 0);
-							userScores.put(data.getActiveUsers().get(0), newScore);
-							Files.write(
-									Path.of("users.txt"),
-									(data.getActiveUsers().get(0) + "\n").getBytes(),
-									StandardOpenOption.APPEND
-							);
-							msg = new Message("client: " + count + " name set: " + data.getActiveUsers().get(0));
-							clientScore = newScore;
-							callback.accept(msg);
-							msg = new Message(data.getActiveUsers().get(0),Message.messageType.USERNAME);
-							out.writeObject(msg);
-							msg = (Message) in.readObject();
-							if(msg.msgType() != Message.messageType.ACK){
-								throw new RuntimeException();
-							}
-							msg = new Message(clientScore, Message.messageType.SCORES);
-
-							out.writeObject(msg);
-							ArrayList<String> tempList = new ArrayList<>(userNames.values());
-							msg = new Message(tempList, Message.messageType.USERLOG);
-							updateClients(msg);
-							callback.accept(msg);
-
-							HashSet<String> friends = new HashSet<>();
-							friendsMap.put(data.getActiveUsers().get(0), friends);
-							msg = new Message(friends, Message.messageType.FRIENDS);
-							out.writeObject(msg);
-						}
-						else if(userInfo.containsKey(data.getActiveUsers().get(0)) && userInfo.get(data.getActiveUsers().get(0)).equals(data.getActiveUsers().get(1))){
+//						if (!userInfo.containsKey(data.getActiveUsers().get(0)) && !Objects.equals(data.getActiveUsers().get(1), "")) {
+//							userNames.put(count, data.getActiveUsers().get(0));
+//
+//							Files.write(
+//									Path.of("info.txt"),
+//									(data.getActiveUsers().get(0) + " " + data.getActiveUsers().get(1) + " 0 0 0" + "\n").getBytes(),
+//									StandardOpenOption.APPEND
+//							);
+//							userInfo.put(data.getActiveUsers().get(0),data.getActiveUsers().get(1));
+//							Message.MyWinDrawLoss newScore = new Message.MyWinDrawLoss(0, 0, 0);
+//							userScores.put(data.getActiveUsers().get(0), newScore);
+//							Files.write(
+//									Path.of("users.txt"),
+//									(data.getActiveUsers().get(0) + "\n").getBytes(),
+//									StandardOpenOption.APPEND
+//							);
+//							msg = new Message("client: " + count + " name set: " + data.getActiveUsers().get(0));
+//							clientScore = newScore;
+//							callback.accept(msg);
+//							msg = new Message(data.getActiveUsers().get(0),Message.messageType.USERNAME);
+//							out.writeObject(msg);
+//							msg = (Message) in.readObject();
+//							if(msg.msgType() != Message.messageType.ACK){
+//								throw new RuntimeException();
+//							}
+//							msg = new Message(clientScore, Message.messageType.SCORES);
+//
+//							out.writeObject(msg);
+//							ArrayList<String> tempList = new ArrayList<>(userNames.values());
+//							msg = new Message(tempList, Message.messageType.USERLOG);
+//							updateClients(msg);
+//							callback.accept(msg);
+//
+//							HashSet<String> friends = new HashSet<>();
+//							friendsMap.put(data.getActiveUsers().get(0), friends);
+//							msg = new Message(friends, Message.messageType.FRIENDS);
+//							out.writeObject(msg);
+//						}
+						if(userInfo.containsKey(data.getActiveUsers().get(0)) && userInfo.get(data.getActiveUsers().get(0)).equals(data.getActiveUsers().get(1))){
 							userNames.put(count, data.getActiveUsers().get(0));
 							msg = new Message("client: " + count + " name set: " + data.getActiveUsers().get(0));
 							//updateClients(msg);
@@ -231,14 +231,10 @@ public class Server {
 								friendsMap.putIfAbsent(friend, new HashSet<>());
 								friendsMap.get(friend).add(loggedInUser);
 							}
-// 1. Send logged-in user's friends list to them (you already do this)
-
-// 2. Update all users who have THIS user as a friend
 							for (ClientThread c : clients) {
 								String other = userNames.get(c.count);
 								if (other == null) continue;
 
-								// If other user has loggedInUser as a friend
 								if (friendsMap.getOrDefault(other, new HashSet<>()).contains(loggedInUser)) {
 
 									HashSet<String> updated = new HashSet<>(friendsMap.get(other));
@@ -252,6 +248,28 @@ public class Server {
 							}
 						}
 						else {
+							msg = new Message("", Message.messageType.USERNAME);
+							out.writeObject(msg);
+						}
+					}
+					else if(data.msgType() == Message.messageType.REGISTER) {
+						if (!userInfo.containsKey(data.getActiveUsers().get(0)) && !Objects.equals(data.getActiveUsers().get(1), "")) {
+							userNames.put(count, data.getActiveUsers().get(0));
+
+							Files.write(
+									Path.of("info.txt"),
+									(data.getActiveUsers().get(0) + " " + data.getActiveUsers().get(1) + " 0 0 0" + "\n").getBytes(),
+									StandardOpenOption.APPEND
+							);
+							userInfo.put(data.getActiveUsers().get(0), data.getActiveUsers().get(1));
+							Message.MyWinDrawLoss newScore = new Message.MyWinDrawLoss(0, 0, 0);
+							userScores.put(data.getActiveUsers().get(0), newScore);
+							Files.write(
+									Path.of("users.txt"),
+									(data.getActiveUsers().get(0) + "\n").getBytes(),
+									StandardOpenOption.APPEND
+							);
+						} else {
 							msg = new Message("", Message.messageType.USERNAME);
 							out.writeObject(msg);
 						}

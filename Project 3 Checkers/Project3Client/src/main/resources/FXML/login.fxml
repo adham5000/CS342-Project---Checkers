@@ -27,6 +27,7 @@
                      </children>
                   </VBox>
                   <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
+                     <Button alignment="CENTER" styleClass="defaultButton" mnemonicParsing="false" onAction="#handleRegisterUser" text="Register Player" />
                      <Button alignment="CENTER" styleClass="defaultButton" mnemonicParsing="false" onAction="#handleStartGame" text="Play Game" />
                   </HBox>
                </children>
