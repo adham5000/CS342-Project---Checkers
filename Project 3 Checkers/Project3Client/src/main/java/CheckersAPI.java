@@ -24,7 +24,7 @@ public class CheckersAPI {
     @FXML private TextField passfield;
     @FXML private TextField userfield;
     @FXML private TextField sendField;
-    @FXML private Button resignBtn, startGameBtn, drawBtn, rematchBtn;
+    @FXML private Button resignBtn, startGameBtn, drawBtn, rematchBtn,challengeBtn;
     @FXML private Label player1Name, player1WinDrawLoss, player2Name, player2WinDrawLoss;
     @FXML private Label erroruser;
     @FXML private Label rematchRequest;
@@ -82,10 +82,10 @@ public class CheckersAPI {
         Message msg = (Message) data;
         Platform.runLater(() -> {
         if (msg.msgType() == Message.messageType.USERNAME) {
-            if(Objects.equals(msg.returnMessage(), "")){
-                erroruser.setVisible(true);
-            }
-            else{
+//            if(Objects.equals(msg.returnMessage(), "")){
+//                erroruser.setVisible(true);
+//            }
+//            else{
                 myName = msg.returnMessage();
                 try {
                     FXMLLoader loader = new FXMLLoader(getClass().getResource("/FXML/checkersMulti.fxml"));
@@ -100,12 +100,17 @@ public class CheckersAPI {
                     controller.setStage(stage);
 
                     controller.buildBoard();
-
                     Scene scene = new Scene(root);
                     scene.getStylesheets().add(
                             getClass().getResource("/STYLES/scene1.css").toExternalForm()
                     );
                     stage.setScene(scene);
+                    controller.listFriends.setOnMouseClicked(event -> {
+                        String selected = controller.listFriends.getSelectionModel().getSelectedItem();
+                        if (selected != null) {
+                            controller.friendField.setText(selected);
+                        }
+                    });
                     Message message = new Message(Message.messageType.ACK);
                     client.send(message);
                 }
@@ -113,11 +118,16 @@ public class CheckersAPI {
                     e.printStackTrace();
                 }
             }
+        //}
+        else if(msg.msgType() == Message.messageType.ERROR){
+            erroruser.setVisible(true);
+            erroruser.setText(msg.returnMessage());
         }
         else if (msg.msgType() == Message.messageType.USERLOG) {
             listUsers.getItems().setAll(msg.getActiveUsers());
         }
         else if(msg.msgType() == Message.messageType.GAME_START){
+            challengeBtn.setDisable(true);
             startGameBtn.setDisable(true);
             drawBtn.setDisable(false);
             resignBtn.setDisable(false);
@@ -242,6 +252,7 @@ public class CheckersAPI {
             startGameBtn.setDisable(false);
             resignBtn.setDisable(true);
             drawBtn.setDisable(true);
+            challengeBtn.setDisable(false);
             rematchRequest.setText("");
         }
         else if (msg.msgType() == Message.messageType.SCORES){
@@ -374,5 +385,13 @@ public class CheckersAPI {
         winPopup.setVisible(false);
         Message msg = new Message(player2Name.getText(),Message.messageType.QUIT);
         client.send(msg);
+        buildBoard();
+    }
+    @FXML void challengeBtnHandler(ActionEvent event) {
+        String s = friendField.getText();
+        if(listFriends.getItems().contains(s)) {
+            Message msg = new Message(s,Message.messageType.CHALLENGE);
+            client.send(msg);
+        }
     }
 }

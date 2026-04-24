@@ -1,7 +1,7 @@
 
-as as 20 5 33
-da da 28 5 23
-test test 0 0 0
+as as 28 6 37
+da da 31 5 29
+test test 0 1 2
 zotri zotri 0 0 0
 hamami hamami 0 0 0
 polo polo 0 0 1
@@ -19,4 +19,5 @@ wrw wreer 1 0 1
 loko sdksjdn 1 0 1
 asdasda asdl 1 0 1
 Finally fuck 0 0 0
+besianuuu a 0 0 0
 pool pool 1 0 1

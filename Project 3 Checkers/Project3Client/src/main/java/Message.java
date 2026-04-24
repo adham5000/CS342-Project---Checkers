@@ -19,6 +19,8 @@ public class Message implements Serializable {
         QUIT,
         REMATCH,
         REGISTER,
+        ERROR,
+        CHALLENGE,
     }
 
     public static class MyWinDrawLoss implements Serializable {

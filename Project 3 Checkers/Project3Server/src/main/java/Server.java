@@ -105,6 +105,8 @@ public class Server {
 		private int playerColor;
 		Message.MyWinDrawLoss clientScore;
 		boolean rematchRequested;
+		boolean challengeRequested;
+		String challengerName;
 
 		ClientThread(Socket s, int count){
 			this.connection = s;
@@ -159,45 +161,7 @@ public class Server {
 					Message data = (Message) in.readObject(); // This reads txt from client
 
 					if (data.msgType() == Message.messageType.USERNAME) {
-//						if (!userInfo.containsKey(data.getActiveUsers().get(0)) && !Objects.equals(data.getActiveUsers().get(1), "")) {
-//							userNames.put(count, data.getActiveUsers().get(0));
-//
-//							Files.write(
-//									Path.of("info.txt"),
-//									(data.getActiveUsers().get(0) + " " + data.getActiveUsers().get(1) + " 0 0 0" + "\n").getBytes(),
-//									StandardOpenOption.APPEND
-//							);
-//							userInfo.put(data.getActiveUsers().get(0),data.getActiveUsers().get(1));
-//							Message.MyWinDrawLoss newScore = new Message.MyWinDrawLoss(0, 0, 0);
-//							userScores.put(data.getActiveUsers().get(0), newScore);
-//							Files.write(
-//									Path.of("users.txt"),
-//									(data.getActiveUsers().get(0) + "\n").getBytes(),
-//									StandardOpenOption.APPEND
-//							);
-//							msg = new Message("client: " + count + " name set: " + data.getActiveUsers().get(0));
-//							clientScore = newScore;
-//							callback.accept(msg);
-//							msg = new Message(data.getActiveUsers().get(0),Message.messageType.USERNAME);
-//							out.writeObject(msg);
-//							msg = (Message) in.readObject();
-//							if(msg.msgType() != Message.messageType.ACK){
-//								throw new RuntimeException();
-//							}
-//							msg = new Message(clientScore, Message.messageType.SCORES);
-//
-//							out.writeObject(msg);
-//							ArrayList<String> tempList = new ArrayList<>(userNames.values());
-//							msg = new Message(tempList, Message.messageType.USERLOG);
-//							updateClients(msg);
-//							callback.accept(msg);
-//
-//							HashSet<String> friends = new HashSet<>();
-//							friendsMap.put(data.getActiveUsers().get(0), friends);
-//							msg = new Message(friends, Message.messageType.FRIENDS);
-//							out.writeObject(msg);
-//						}
-						if(userInfo.containsKey(data.getActiveUsers().get(0)) && userInfo.get(data.getActiveUsers().get(0)).equals(data.getActiveUsers().get(1))){
+						if(userInfo.containsKey(data.getActiveUsers().get(0)) && userInfo.get(data.getActiveUsers().get(0)).equals(data.getActiveUsers().get(1)) && !userNames.containsValue(data.getActiveUsers().get(0))){
 							userNames.put(count, data.getActiveUsers().get(0));
 							msg = new Message("client: " + count + " name set: " + data.getActiveUsers().get(0));
 							//updateClients(msg);
@@ -247,8 +211,16 @@ public class Server {
 								}
 							}
 						}
+						else if (userNames.containsValue(data.getActiveUsers().get(0))){
+							msg = new Message("USER IS ALREADY LOGGED IN", Message.messageType.ERROR);
+							out.writeObject(msg);
+						}
+						else if(!userInfo.containsKey(data.getActiveUsers().get(0))){
+							msg = new Message("USER DOES NOT EXIST", Message.messageType.ERROR);
+							out.writeObject(msg);
+						}
 						else {
-							msg = new Message("", Message.messageType.USERNAME);
+							msg = new Message("INCORRECT PASSWORD", Message.messageType.ERROR);
 							out.writeObject(msg);
 						}
 					}
@@ -269,8 +241,12 @@ public class Server {
 									(data.getActiveUsers().get(0) + "\n").getBytes(),
 									StandardOpenOption.APPEND
 							);
-						} else {
-							msg = new Message("", Message.messageType.USERNAME);
+						} else if(Objects.equals(data.getActiveUsers().get(1), "")){
+							msg = new Message("YOU CANNOT CHOOSE AN EMPTY PASSWORD", Message.messageType.ERROR);
+							out.writeObject(msg);
+						}
+						else{
+							msg = new Message("USERNAME ALREADY EXISTS", Message.messageType.ERROR);
 							out.writeObject(msg);
 						}
 					}
@@ -321,6 +297,7 @@ public class Server {
 									msg = new Message("YOU WON", Message.messageType.GAME_OVER);
 									game.getRedPlayer().out.writeObject(msg);
 									activeGames.remove(game);
+									game.getOpponent(this).game = null;
 									game = null;
 								}
 								if(game != null && game.redLost()){
@@ -348,6 +325,7 @@ public class Server {
 									msg = new Message("YOU WON", Message.messageType.GAME_OVER);
 									game.getWhitePlayer().out.writeObject(msg);
 									activeGames.remove(game);
+									game.getOpponent(this).game = null;
 									game = null;
 								}
 								if(game != null && game.movesWithoutCap == 40){
@@ -374,6 +352,7 @@ public class Server {
 									game.getWhitePlayer().out.writeObject(msg);
 									game.getRedPlayer().out.writeObject(msg);
 									activeGames.remove(game);
+									game.getOpponent(this).game = null;
 									game = null;
 								}
 							}
@@ -412,6 +391,7 @@ public class Server {
 							game.getOpponent(this).out.writeObject(msg);
 
 							activeGames.remove(game);
+							game.getOpponent(this).game = null;
 							game = null;
 						}
 						else {
@@ -445,6 +425,7 @@ public class Server {
 							msg = new Message("YOU WON", Message.messageType.GAME_OVER);
 							game.getWhitePlayer().out.writeObject(msg);
 							activeGames.remove(game);
+							game.getOpponent(this).game = null;
 							game = null;
 						}
 						else{
@@ -472,7 +453,9 @@ public class Server {
 							msg = new Message("YOU WON", Message.messageType.GAME_OVER);
 							game.getRedPlayer().out.writeObject(msg);
 							activeGames.remove(game);
+							game.getOpponent(this).game = null;
 							game = null;
+
 						}
 					}
 					else if (data.msgType() == Message.messageType.FRIEND_REQUEST) {
@@ -549,8 +532,31 @@ public class Server {
 							}
 						}
 					}
+					else if(data.msgType() == Message.messageType.CHALLENGE){
+						challengeRequested = true;
+						challengerName = data.returnMessage();
+						for (ClientThread c : clients) {
+							if(Objects.equals(userNames.get(c.count), data.returnMessage())){
+								if(c.challengeRequested && Objects.equals(c.challengerName, userNames.get(count))){
+									startGame(this,c);
+									c.challengeRequested = false;
+									this.challengeRequested = false;
+									c.challengerName = null;
+									this.challengerName = null;
+								}
+								else if(c.game != null){
+									msg = new Message("YOUR CHALLENGEE IS ALREADY IN A GAME!",Message.messageType.GLOBAL);
+									out.writeObject(msg);
+								}
+								else {
+									msg = new Message(userNames.get(count) + " CHALLENGES YOU TO PLAY A GAME!",Message.messageType.CHALLENGE);
+									c.out.writeObject(msg);
+								}
+							}
+						}
+					}
 					else if(data.msgType() == Message.messageType.GLOBAL && game!=null){
-						msg = new Message("user: " + userNames.get(count) + ": " + data.returnMessage());
+						msg = new Message(userNames.get(count) + ": " + data.returnMessage());
 						game.getOpponent(this).out.writeObject(msg);
 						callback.accept(msg);
 					}
@@ -575,6 +581,7 @@ public class Server {
 							msg = new Message("YOU WON", Message.messageType.GAME_OVER);
 							game.getOpponent(this).out.writeObject(msg);
 							activeGames.remove(game);
+							game.getOpponent(this).game = null;
 							game = null;
 						}
 					}
