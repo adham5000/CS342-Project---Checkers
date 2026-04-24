@@ -24,6 +24,7 @@ public class CheckersAPI {
     @FXML private TextField passfield;
     @FXML private TextField userfield;
     @FXML private TextField sendField;
+    @FXML private TextField challengeField;
     @FXML private Button resignBtn, startGameBtn, drawBtn, rematchBtn,challengeBtn;
     @FXML private Label player1Name, player1WinDrawLoss, player2Name, player2WinDrawLoss;
     @FXML private Label erroruser;
@@ -51,6 +52,25 @@ public class CheckersAPI {
     @FXML
     public void initialize() {}
 
+    private void adjustBoard(){
+        for(int r = 0; r < 8;++r){
+            for(int c = 0; c < 8;++c){
+
+                if((r == 0 && c % 2 == 0) || (r == 1 && c % 2 == 1) || (r == 2 && c % 2 == 0)){
+                    squares[r][c].setPiece(Checkersquare.Piece.RED);
+                }
+                else if ((r == 6 && c % 2 == 0) || (r == 7 && c % 2 == 1) || (r == 5 && c % 2 == 1)) {
+                    squares[r][c].setPiece(Checkersquare.Piece.WHITE);
+                }
+                else {
+                    squares[r][c].setPiece(Checkersquare.Piece.EMPTY);
+                }
+            }
+        }
+        drawBtn.setDisable(true);
+        resignBtn.setDisable(true);
+        player1Name.setText(myName);
+    }
 
     private void buildBoard() {
 
@@ -82,10 +102,6 @@ public class CheckersAPI {
         Message msg = (Message) data;
         Platform.runLater(() -> {
         if (msg.msgType() == Message.messageType.USERNAME) {
-//            if(Objects.equals(msg.returnMessage(), "")){
-//                erroruser.setVisible(true);
-//            }
-//            else{
                 myName = msg.returnMessage();
                 try {
                     FXMLLoader loader = new FXMLLoader(getClass().getResource("/FXML/checkersMulti.fxml"));
@@ -105,10 +121,35 @@ public class CheckersAPI {
                             getClass().getResource("/STYLES/scene1.css").toExternalForm()
                     );
                     stage.setScene(scene);
+                    controller.listFriends.setCellFactory(list -> new ListCell<String>() {
+
+                        @Override
+                        protected void updateItem(String item, boolean empty) {
+                            super.updateItem(item, empty);
+
+                            if (empty || item == null) {
+                                setText(null);
+                                getStyleClass().remove("highlighted");
+                            } else {
+                                setText(item);
+
+                                // highlight if selected
+                                if (item.equals(controller.listFriends.getSelectionModel().getSelectedItem())) {
+                                    if (!getStyleClass().contains("highlighted")) {
+                                        getStyleClass().add("highlighted");
+                                    }
+                                } else {
+                                    getStyleClass().remove("highlighted");
+                                }
+                            }
+                        }
+                    });
                     controller.listFriends.setOnMouseClicked(event -> {
+                        controller.listFriends.refresh();
                         String selected = controller.listFriends.getSelectionModel().getSelectedItem();
                         if (selected != null) {
-                            controller.friendField.setText(selected);
+                            controller.challengeField.setText(selected);
+
                         }
                     });
                     Message message = new Message(Message.messageType.ACK);
@@ -385,13 +426,14 @@ public class CheckersAPI {
         winPopup.setVisible(false);
         Message msg = new Message(player2Name.getText(),Message.messageType.QUIT);
         client.send(msg);
-        buildBoard();
+        adjustBoard();
     }
     @FXML void challengeBtnHandler(ActionEvent event) {
-        String s = friendField.getText();
+        String s = challengeField.getText();
         if(listFriends.getItems().contains(s)) {
             Message msg = new Message(s,Message.messageType.CHALLENGE);
             client.send(msg);
         }
+        challengeField.clear();
     }
 }

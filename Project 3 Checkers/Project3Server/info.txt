@@ -1,7 +1,7 @@
 
-as as 28 6 37
-da da 31 5 29
-test test 0 1 2
+as as 28 7 39
+da da 32 6 30
+test test 4 2 3
 zotri zotri 0 0 0
 hamami hamami 0 0 0
 polo polo 0 0 1
@@ -21,3 +21,7 @@ asdasda asdl 1 0 1
 Finally fuck 0 0 0
 besianuuu a 0 0 0
 pool pool 1 0 1
+asdada adads 0 0 0
+akilthebest best 0 0 0
+ewdw weded 0 0 0
+sdfsf adsad 0 1 1

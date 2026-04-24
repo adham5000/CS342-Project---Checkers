@@ -20,7 +20,7 @@
 }
 
 .defaultTextField{
-    -fx-control-inner-background: peru;
+    -fx-control-inner-background: burlywood;
 }
 
 .defaultButton{
@@ -52,6 +52,10 @@
 
 .list-cell:odd {
     -fx-background-color: #FFFFFF;
+}
+.list-cell.highlighted {
+    -fx-background-color: burlywood;   /* or any color you want */
+    -fx-text-fill: black;
 }
 .scoreLabel {
     -fx-font-family: "Segoe UI Semibold";

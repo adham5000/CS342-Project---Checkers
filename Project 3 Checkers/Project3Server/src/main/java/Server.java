@@ -225,8 +225,7 @@ public class Server {
 						}
 					}
 					else if(data.msgType() == Message.messageType.REGISTER) {
-						if (!userInfo.containsKey(data.getActiveUsers().get(0)) && !Objects.equals(data.getActiveUsers().get(1), "")) {
-							userNames.put(count, data.getActiveUsers().get(0));
+						if (!userInfo.containsKey(data.getActiveUsers().get(0)) && !Objects.equals(data.getActiveUsers().get(1), "") && !Objects.equals(data.getActiveUsers().get(0), "")) {
 
 							Files.write(
 									Path.of("info.txt"),
@@ -241,8 +240,8 @@ public class Server {
 									(data.getActiveUsers().get(0) + "\n").getBytes(),
 									StandardOpenOption.APPEND
 							);
-						} else if(Objects.equals(data.getActiveUsers().get(1), "")){
-							msg = new Message("YOU CANNOT CHOOSE AN EMPTY PASSWORD", Message.messageType.ERROR);
+						} else if(Objects.equals(data.getActiveUsers().get(1), "") || Objects.equals(data.getActiveUsers().get(0), "")) {
+							msg = new Message("YOU CANNOT CHOOSE AN EMPTY PASSWORD/USERNAME", Message.messageType.ERROR);
 							out.writeObject(msg);
 						}
 						else{
@@ -625,8 +624,6 @@ public class Server {
 					catch(Exception e1) {
 						e1.printStackTrace();
 					}
-					msg = new Message("Client #" + count + " has left the server!");
-					updateClients(msg);
 					String disconnectedUser = userNames.get(count);
 
 // Update all users who had THIS user as a friend

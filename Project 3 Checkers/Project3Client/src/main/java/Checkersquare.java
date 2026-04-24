@@ -18,9 +18,9 @@ public class Checkersquare extends Button {
     private Piece piece;
 
     Checkersquare(int row, int col, Piece piece) {
-        setPrefSize(100, 100);      // preferred size
-        setMinSize(0, 0);            // allow shrinking
-        setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);// allow growing
+        setPrefSize(100, 100);
+        setMinSize(0, 0);
+        setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
 
         this.row = row;
         this.col = col;
