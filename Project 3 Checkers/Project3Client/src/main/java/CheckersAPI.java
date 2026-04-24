@@ -7,6 +7,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 
 import javafx.event.ActionEvent;
+import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
 import java.util.*;
@@ -25,14 +26,17 @@ public class CheckersAPI {
     @FXML private Button resignBtn;
     @FXML private Button startGameBtn;
     @FXML private Button drawBtn;
-    @FXML private Button sendBtn;
+    @FXML private Button rematchBtn;
+    @FXML private Button quitBtn;
     @FXML private Label player1Name;
     @FXML private Label player2Name;
     @FXML private Label player1WinDrawLoss;
     @FXML private Label player2WinDrawLoss;
     @FXML private Label erroruser;
+    @FXML private Label rematchRequest;
+    @FXML private Label winMessage;
     @FXML private TextField sendField;
-
+    @FXML private StackPane winPopup;
     private Stage stage;
 
     private Client client;
@@ -105,6 +109,8 @@ public class CheckersAPI {
                     controller.buildBoard();
 
                     stage.setScene(new Scene(root));
+                    Message message = new Message(Message.messageType.ACK);
+                    client.send(message);
                 }
                 catch(Exception e){
                     e.printStackTrace();
@@ -226,10 +232,13 @@ public class CheckersAPI {
         }
         else if (msg.msgType() == Message.messageType.GAME_OVER){
             myColor = "";
-            listMoves.getItems().add((msg.returnMessage()));
+            winPopup.setVisible(true);
+            winMessage.setText(msg.returnMessage());
+            rematchBtn.setDisable(false);
             startGameBtn.setDisable(false);
             resignBtn.setDisable(true);
             drawBtn.setDisable(true);
+            rematchRequest.setText("");
         }
         else if (msg.msgType() == Message.messageType.SCORES){
             if (player1WinDrawLoss == null || player2WinDrawLoss == null) {
@@ -252,6 +261,17 @@ public class CheckersAPI {
             listFriends.getItems().clear();
             HashSet<String> friends = msg.getFriends();
             listFriends.getItems().addAll(friends);
+        }
+        else if(msg.msgType() == Message.messageType.QUIT){
+            rematchBtn.setDisable(true);
+        }
+        else if(msg.msgType() == Message.messageType.REMATCH){
+            if(msg.returnMessage() == null){
+                winPopup.setVisible(false);
+            }
+            else{
+                rematchRequest.setText(msg.returnMessage());
+            }
         }
         else {
             chatList.getItems().add(msg.returnMessage());
@@ -361,6 +381,17 @@ public class CheckersAPI {
     @FXML
     public void resignBtnHandler(ActionEvent event) {
         Message msg = new Message(Message.messageType.RESIGN);
+        client.send(msg);
+    }
+    @FXML void rematchBtnHandler(ActionEvent event) {
+        Message msg = new Message(player2Name.getText(),Message.messageType.REMATCH);
+        rematchRequest.setText("YOU REQUESTED A REMATCH");
+        rematchBtn.setDisable(true);
+        client.send(msg);
+    }
+    @FXML void quitBtnHandler(ActionEvent event) {
+        winPopup.setVisible(false);
+        Message msg = new Message(player2Name.getText(),Message.messageType.QUIT);
         client.send(msg);
     }
 }

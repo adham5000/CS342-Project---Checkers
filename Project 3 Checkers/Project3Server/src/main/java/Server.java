@@ -104,6 +104,7 @@ public class Server {
 		private GameSession game;
 		private int playerColor;
 		Message.MyWinDrawLoss clientScore;
+		boolean rematchRequested;
 
 		ClientThread(Socket s, int count){
 			this.connection = s;
@@ -179,6 +180,10 @@ public class Server {
 							callback.accept(msg);
 							msg = new Message(data.getActiveUsers().get(0),Message.messageType.USERNAME);
 							out.writeObject(msg);
+							msg = (Message) in.readObject();
+							if(msg.msgType() != Message.messageType.ACK){
+								throw new RuntimeException();
+							}
 							msg = new Message(clientScore, Message.messageType.SCORES);
 
 							out.writeObject(msg);
@@ -199,6 +204,10 @@ public class Server {
 							callback.accept(msg);
 							msg = new Message(data.getActiveUsers().get(0),Message.messageType.USERNAME);
 							out.writeObject(msg);
+							msg = (Message) in.readObject();
+							if(msg.msgType() != Message.messageType.ACK){
+								throw new RuntimeException();
+							}
 							clientScore = userScores.get(data.getActiveUsers().get(0));
 							msg = new Message(clientScore, Message.messageType.SCORES);
 							out.writeObject(msg);
@@ -503,6 +512,34 @@ public class Server {
 							}
 						}
 					}
+					else if(data.msgType() == Message.messageType.QUIT){
+						rematchRequested = false;
+						for (ClientThread c : clients) {
+							if(Objects.equals(userNames.get(c.count), data.returnMessage())){
+								msg = new Message(Message.messageType.QUIT);
+								c.out.writeObject(msg);
+							}
+						}
+					}
+					else if(data.msgType() == Message.messageType.REMATCH){
+						rematchRequested = true;
+						for (ClientThread c : clients) {
+							if(Objects.equals(userNames.get(c.count), data.returnMessage())){
+								if(c.rematchRequested){
+									msg = new Message(Message.messageType.REMATCH);
+									c.out.writeObject(msg);
+									out.writeObject(msg);
+									startGame(this,c);
+									c.rematchRequested = false;
+									this.rematchRequested = false;
+								}
+								else {
+									msg = new Message(data.returnMessage() + " requested a rematch!",Message.messageType.REMATCH);
+									c.out.writeObject(msg);
+								}
+							}
+						}
+					}
 					else if(data.msgType() == Message.messageType.GLOBAL && game!=null){
 						msg = new Message("user: " + userNames.get(count) + ": " + data.returnMessage());
 						game.getOpponent(this).out.writeObject(msg);
@@ -513,7 +550,28 @@ public class Server {
 					e.printStackTrace();
 					msg = new Message("OOOOPPs...Something wrong with the socket from client: " + count + "....closing down!");
 					callback.accept(msg);
+					try {
+						if (game != null) {
+							game.getOpponent(this).clientScore.wins++;
+							this.clientScore.losses++;
 
+							game.getOpponent(this).out.reset();
+							msg = new Message(game.getOpponent(this).clientScore, Message.messageType.SCORES);
+							game.getOpponent(this).out.writeObject(msg);
+
+							game.getOpponent(this).out.reset();
+							msg = new Message("OPPONENT", clientScore, Message.messageType.SCORES);
+							game.getOpponent(this).out.writeObject(msg);
+
+							msg = new Message("YOU WON", Message.messageType.GAME_OVER);
+							game.getOpponent(this).out.writeObject(msg);
+							activeGames.remove(game);
+							game = null;
+						}
+					}
+					catch (Exception e1) {
+						e1.printStackTrace();
+					}
 					try {
 						List<String> lines = Files.readAllLines(Path.of("info.txt"));
 

@@ -25,7 +25,7 @@
                      <Label text="Users Online:" />
                      <ListView fx:id="listUsers" prefHeight="217.6" prefWidth="180.0" />
                      <Label text="Online Friends:" />
-                     <ListView fx:id = "listFriends" prefHeight="217.6" prefWidth="180.0" />
+                     <ListView fx:id="listFriends" prefHeight="217.6" prefWidth="180.0" />
                   </VBox>
                </HBox>
                <HBox prefHeight="100.0" prefWidth="780.0">
@@ -33,7 +33,7 @@
                   <TextField fx:id="sendField" />
                   <Button fx:id="startGameBtn" mnemonicParsing="false" onAction="#handleRandomGame" text="start random game" />
                   <Button fx:id="drawBtn" mnemonicParsing="false" onAction="#drawBtnHandler" prefHeight="25.0" prefWidth="102.0" text="request draw" />
-                  <Button fx:id = "resignBtn" mnemonicParsing="false" prefHeight="25.0" prefWidth="62.0" text="Resign" onAction = "#resignBtnHandler"/>
+                  <Button fx:id="resignBtn" mnemonicParsing="false" onAction="#resignBtnHandler" prefHeight="25.0" prefWidth="62.0" text="Resign" />
                   <Button fx:id="friendBtn" mnemonicParsing="false" onAction="#friendBtnHandler" text="Add Friend">
                      <HBox.margin>
                         <Insets />
@@ -54,5 +54,17 @@
             </VBox>
          </center>
       </BorderPane>
+      <StackPane fx:id="winPopup" alignment="CENTER" style="-fx-background-color: rgba(0,0,0,0.6);" visible="false" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0" pickOnBounds="true">
+
+         <VBox maxHeight="400.0" maxWidth="300.0" spacing="20" style="-fx-background-color: white; -fx-padding: 30; -fx-background-radius: 10;">
+            <Label fx:id="winMessage" style="-fx-font-size: 28px; -fx-font-weight: bold;" />
+            <Label fx:id ="rematchRequest"/>
+            <HBox>
+               <Button fx:id = "rematchBtn" onAction="#rematchBtnHandler" text="rematch" />
+               <Button fx:id = "quitBtn" text = "quit" onAction="#quitBtnHandler"/>
+            </HBox>
+         </VBox>
+
+      </StackPane>
    </children>
 </AnchorPane>

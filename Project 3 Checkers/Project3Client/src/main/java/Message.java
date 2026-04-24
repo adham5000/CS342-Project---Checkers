@@ -17,6 +17,9 @@ public class Message implements Serializable {
         FRIENDS,
         FRIEND_REQUEST,
         RESIGN,
+        ACK,
+        QUIT,
+        REMATCH,
     }
 
     public static class MyWinDrawLoss implements Serializable {
