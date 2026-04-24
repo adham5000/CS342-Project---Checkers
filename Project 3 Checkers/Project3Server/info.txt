@@ -1,6 +1,6 @@
 
-as as 18 5 31
-da da 26 5 20
+as as 20 5 33
+da da 28 5 22
 test test 0 0 0
 zotri zotri 0 0 0
 hamami hamami 0 0 0

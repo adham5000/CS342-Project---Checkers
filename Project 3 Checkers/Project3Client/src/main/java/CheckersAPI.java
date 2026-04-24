@@ -215,15 +215,22 @@ public class CheckersAPI {
                     }
                 }
                 Checkersquare.Piece piece = squares[fromRow][fromCol].getPiece();
+                String player;
+                if(piece == Checkersquare.Piece.RED || piece == Checkersquare.Piece.RED_KING){
+                    player = "RED";
+                }
+                else{
+                    player = "WHITE";
+                }
                 squares[fromRow][fromCol].setPiece(Checkersquare.Piece.EMPTY);
                 squares[toRow][toCol].setPiece(piece);
 
                 if (capturedCol != -1) {
-                    listMoves.getItems().add(squares[fromRow][fromCol].getSquareNumber() + "x" + squares[toRow][toCol].getSquareNumber());
+                    listMoves.getItems().add(player + ": " + squares[fromRow][fromCol].getSquareNumber() + "x" + squares[toRow][toCol].getSquareNumber());
                     squares[capturedRow][capturedCol].setPiece(Checkersquare.Piece.EMPTY);
                 }
                 else{
-                    listMoves.getItems().add(squares[fromRow][fromCol].getSquareNumber() + "-" + squares[toRow][toCol].getSquareNumber());
+                    listMoves.getItems().add(player + ": " + squares[fromRow][fromCol].getSquareNumber() + "-" + squares[toRow][toCol].getSquareNumber());
                 }
                 if (kingCol != -1) {
                     if (squares[kingRow][kingCol].getPiece() == Checkersquare.Piece.WHITE) {
