@@ -45,7 +45,6 @@ public class Client extends Thread{
 			}
 			catch(Exception e) {}
 		}
-	
     }
 	
 	public void send(Message data) {
@@ -53,7 +52,6 @@ public class Client extends Thread{
 		try {
 			out.writeObject(data);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

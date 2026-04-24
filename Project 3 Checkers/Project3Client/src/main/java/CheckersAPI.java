@@ -23,19 +23,12 @@ public class CheckersAPI {
     @FXML private TextField friendField;
     @FXML private TextField passfield;
     @FXML private TextField userfield;
-    @FXML private Button resignBtn;
-    @FXML private Button startGameBtn;
-    @FXML private Button drawBtn;
-    @FXML private Button rematchBtn;
-    @FXML private Button quitBtn;
-    @FXML private Label player1Name;
-    @FXML private Label player2Name;
-    @FXML private Label player1WinDrawLoss;
-    @FXML private Label player2WinDrawLoss;
+    @FXML private TextField sendField;
+    @FXML private Button resignBtn, startGameBtn, drawBtn, rematchBtn;
+    @FXML private Label player1Name, player1WinDrawLoss, player2Name, player2WinDrawLoss;
     @FXML private Label erroruser;
     @FXML private Label rematchRequest;
     @FXML private Label winMessage;
-    @FXML private TextField sendField;
     @FXML private StackPane winPopup;
     private Stage stage;
 
@@ -311,16 +304,15 @@ public class CheckersAPI {
         }
 
         Checkersquare from =  selectedSquare;
-        Checkersquare to =  square;
         Message message;
 
         from.getStyleClass().remove("selected-square");
         selectedSquare = null;
         if(myColor != "") {
             if (myColor.equals("RED")) {
-                message = new Message(from.getRow(), from.getCol(), to.getRow(), to.getCol(), Message.messageType.CHECKERMOVE);
+                message = new Message(from.getRow(), from.getCol(), square.getRow(), square.getCol(), Message.messageType.CHECKERMOVE);
             } else {
-                message = new Message(7 - from.getRow(), 7 - from.getCol(), 7 - to.getRow(), 7 - to.getCol(), Message.messageType.CHECKERMOVE);
+                message = new Message(7 - from.getRow(), 7 - from.getCol(), 7 - square.getRow(), 7 - square.getCol(), Message.messageType.CHECKERMOVE);
             }
             client.send(message);
         }
@@ -334,8 +326,6 @@ public class CheckersAPI {
 
         Message message = new Message(namepass, Message.messageType.USERNAME);
         client.send(message);
-       // userfield.clear();
-       // passfield.clear();
     }
     @FXML void handleRandomGame(ActionEvent event) {
         Message message = new Message(Message.messageType.GAME_START);
@@ -352,43 +342,11 @@ public class CheckersAPI {
         client.send(msg);
     }
 
-
     @FXML void drawBtnHandler(ActionEvent event) {
         Message msg = new Message("DRAW", Message.messageType.GAME_OVER);
         drawBtn.setDisable(true);
         client.send(msg);
     }
-    public void setFriends(HashSet<String> newFriends) {
-        friends.clear();
-        friends.addAll(newFriends);
-
-        if (listUsers.getCellFactory() == null) {
-            listUsers.setCellFactory(lv -> new ListCell<String>() {
-                @Override
-                protected void updateItem(String item, boolean empty) {
-                    super.updateItem(item, empty);
-
-                    if (empty || item == null) {
-                        setText(null);
-                        setStyle("");
-                        return;
-                    }
-
-                    setText(item);
-
-                    if (friends.contains(item)) {
-                        setStyle("-fx-background-color: lightgreen; -fx-font-weight: bold;");
-                    } else {
-                        setStyle("");
-                    }
-                }
-            });
-        }
-
-
-        listUsers.layout();
-    }
-
 
     @FXML
     public void friendBtnHandler(ActionEvent event) {
@@ -404,12 +362,14 @@ public class CheckersAPI {
         Message msg = new Message(Message.messageType.RESIGN);
         client.send(msg);
     }
+
     @FXML void rematchBtnHandler(ActionEvent event) {
         Message msg = new Message(player2Name.getText(),Message.messageType.REMATCH);
         rematchRequest.setText("YOU REQUESTED A REMATCH");
         rematchBtn.setDisable(true);
         client.send(msg);
     }
+
     @FXML void quitBtnHandler(ActionEvent event) {
         winPopup.setVisible(false);
         Message msg = new Message(player2Name.getText(),Message.messageType.QUIT);

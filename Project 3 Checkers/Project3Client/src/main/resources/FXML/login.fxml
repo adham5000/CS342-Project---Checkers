@@ -3,36 +3,31 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane prefHeight="300.0" prefWidth="500.0" styleClass="root" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="CheckersAPI">
-   <children>
-      <BorderPane layoutY="-1.0" prefHeight="600.0" prefWidth="800.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
-         <center>
-            <VBox alignment="CENTER" prefHeight="380.0" prefWidth="580.0" spacing="10.0" BorderPane.alignment="CENTER">
-               <children>
-                  <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
-                     <children>
-                          <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
-                             <children>
-                                <Label text="Username: " styleClass="defaultLabel" />
-                                <TextField fx:id="userfield" styleClass="defaultTextField"/>
-                             </children>
-                          </HBox>
-                          <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
-                             <children>
-                                <Label text="Password: " styleClass="defaultLabel"/>
-                                <TextField fx:id="passfield" styleClass="defaultTextField"/>
-                             </children>
-                          </HBox>
-                           <Label fx:id="erroruser" text="Error: Wrong Password/No Password entered" visible="false" styleClass="defaultLabel" />
-                     </children>
-                  </VBox>
-                  <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
-                     <Button alignment="CENTER" styleClass="defaultButton" mnemonicParsing="false" onAction="#handleRegisterUser" text="Register Player" />
-                     <Button alignment="CENTER" styleClass="defaultButton" mnemonicParsing="false" onAction="#handleStartGame" text="Play Game" />
-                  </HBox>
-               </children>
+<AnchorPane prefHeight="300.0" prefWidth="500.0" styleClass="root" xmlns="http://javafx.com/javafx/17.0.12"
+            xmlns:fx="http://javafx.com/fxml/1" fx:controller="CheckersAPI">
+   <BorderPane layoutY="-1.0" prefHeight="600.0" prefWidth="800.0" AnchorPane.bottomAnchor="10.0"
+               AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
+      <center>
+         <VBox alignment="CENTER" prefHeight="380.0" prefWidth="580.0" spacing="10.0" BorderPane.alignment="CENTER">
+            <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
+               <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
+                  <Label text="Username: " styleClass="defaultLabel"/>
+                  <TextField fx:id="userfield" styleClass="defaultTextField"/>
+               </HBox>
+               <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
+                  <Label text="Password: " styleClass="defaultLabel"/>
+                  <TextField fx:id="passfield" styleClass="defaultTextField"/>
+               </HBox>
+               <Label fx:id="erroruser" text="Error: Wrong Password/No Password entered" visible="false"
+                      styleClass="defaultLabel"/>
             </VBox>
-         </center>
-      </BorderPane>
-   </children>
+            <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
+               <Button alignment="CENTER" styleClass="defaultButton" mnemonicParsing="false"
+                       onAction="#handleRegisterUser" text="Register Player"/>
+               <Button alignment="CENTER" styleClass="defaultButton" mnemonicParsing="false"
+                       onAction="#handleStartGame" text="Play Game"/>
+            </HBox>
+         </VBox>
+      </center>
+   </BorderPane>
 </AnchorPane>

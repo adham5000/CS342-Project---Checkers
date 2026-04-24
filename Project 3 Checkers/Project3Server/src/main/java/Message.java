@@ -1,16 +1,14 @@
-import java.awt.*;
+
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 
 public class Message implements Serializable {
     public enum messageType {
-        USERNAME, // For setting username
-        GLOBAL, // For chat log
-        USERLOG, // For showing usernames
-        GROUP,// For creating groups
-        CHECKERMOVE,// For moves
+        USERNAME,       // For setting username
+        GLOBAL,         // For chat log
+        USERLOG,        // For showing usernames
+        CHECKERMOVE,    // For moves
         GAME_START,
         GAME_OVER,
         SCORES,

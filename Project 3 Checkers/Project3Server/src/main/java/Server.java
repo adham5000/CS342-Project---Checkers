@@ -274,15 +274,6 @@ public class Server {
 							out.writeObject(msg);
 						}
 					}
-					else if(data.msgType() == Message.messageType.GROUP){
-						msg = new Message("client: " + count + " user: " + userNames.get(count) + ": " + data.returnMessage() +
-								" sent to: " + data.getActiveUsers());
-						callback.accept(msg);
-
-						msg = new Message("client: " + count + " user: " + userNames.get(count) + ": " + data.returnMessage()
-								, Message.messageType.GROUP, data.getActiveUsers());
-						updateClients(msg);
-					}
 					else if(data.msgType() == Message.messageType.GAME_START){
 						addToQueue(this);
 					}

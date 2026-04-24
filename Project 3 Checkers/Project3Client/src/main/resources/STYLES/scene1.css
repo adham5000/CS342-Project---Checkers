@@ -41,7 +41,6 @@
     -fx-background-color: chocolate;
 }
 
-/* Added from internet not yet modified or added to listviews */
 .list-cell {
     -fx-background-color: #FFFFFF;
     -fx-text-fill: black;
@@ -67,13 +66,3 @@
     -fx-border-radius: 8;
     -fx-border-width: 1;
 }
-/*.winPopupBox {*/
-/*    -fx-background-color: linear-gradient(to bottom, #ffffff, #e8e8e8);*/
-/*    -fx-background-radius: 14;*/
-/*    -fx-padding: 35;*/
-
-/*    -fx-effect: dropshadow(gaussian, rgba(255,215,0,0.6), 30, 0.4, 0, 0);*/
-/*    -fx-border-color: gold;*/
-/*    -fx-border-width: 2;*/
-/*    -fx-border-radius: 14;*/
-/*}*/
