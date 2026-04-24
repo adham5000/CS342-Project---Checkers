@@ -12,9 +12,9 @@
                <HBox prefHeight="470.0" prefWidth="780.0" spacing="10.0">
                   <VBox prefHeight="470.0" prefWidth="180.0">
                      <Label styleClass="defaultLabel" text="Moves:" />
-                     <ListView fx:id="listMoves" prefHeight="217.6" prefWidth="180.0" />
+                     <ListView fx:id="listMoves" prefHeight="217.6" prefWidth="180.0" styleClass="list-cell"/>
                      <Label styleClass="defaultLabel" text="Chat:" />
-                     <ListView fx:id="chatList" prefHeight="217.6" prefWidth="180.0" />
+                     <ListView fx:id="chatList" prefHeight="217.6" prefWidth="180.0" styleClass="list-cell"/>
                   </VBox>
                   <VBox prefHeight="470.0" prefWidth="400.0" spacing="5.0">
                      <Label fx:id="player2Name" styleClass="defaultLabel" text="Opponents Name" />
@@ -23,9 +23,9 @@
                   </VBox>
                   <VBox prefHeight="470.0" prefWidth="180.0">
                      <Label styleClass="defaultLabel" text="Users Online:" />
-                     <ListView fx:id="listUsers" prefHeight="217.6" prefWidth="180.0" />
+                     <ListView fx:id="listUsers" prefHeight="217.6" prefWidth="180.0" styleClass="list-cell"/>
                      <Label styleClass="defaultLabel" text="Online Friends:" />
-                     <ListView fx:id="listFriends" prefHeight="217.6" prefWidth="180.0" />
+                     <ListView fx:id="listFriends" prefHeight="217.6" prefWidth="180.0" styleClass="list-cell"/>
                   </VBox>
                </HBox>
                <HBox prefHeight="100.0" prefWidth="780.0" spacing="420.0">

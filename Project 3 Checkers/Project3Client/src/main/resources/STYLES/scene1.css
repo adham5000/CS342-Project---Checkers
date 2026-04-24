@@ -41,25 +41,19 @@
     -fx-background-color: #a7caf4;
 }
 
-/* Added from internet not yet modified or added to listviews */
-.list-view {
-    -fx-selection-bar: #328BDB;
-    -fx-selection-bar-non-focused: #207BCF;
-}
-
-/* Change background for all rows */
-.list-view .list-cell {
-    -fx-background-color: #f0f0f0;
+.list-cell {
+    -fx-background-color: #328BDB;
     -fx-text-fill: black;
 }
 
-/* Alternating row colors */
-.list-view .list-cell:odd {
-    -fx-background-color: #ffffff;
+.list-cell:even {
+    -fx-background-color: #328BDB;
 }
-.list-view .list-cell:even {
-    -fx-background-color: #e0e0e0;
+
+.list-cell:odd {
+    -fx-background-color: #207BCF;
 }
+
 .scoreLabel {
     -fx-font-family: "Segoe UI Semibold";
     -fx-font-size: 18px;
