@@ -32,7 +32,7 @@
 .defaultButton:hover{
     -fx-font-size: 11px;
     -fx-font-weight: bold;
-    -fx-background-color: peru;
+    -fx-background-color: goldenrod;
 }
 
 .defaultButton:pressed{
