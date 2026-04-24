@@ -24,8 +24,8 @@
                   <VBox prefHeight="470.0" prefWidth="180.0">
                      <Label text="Users Online:" />
                      <ListView fx:id="listUsers" prefHeight="217.6" prefWidth="180.0" />
-                     <Label text="Users Offline:" />
-                     <ListView prefHeight="217.6" prefWidth="180.0" />
+                     <Label text="Online Friends:" />
+                     <ListView fx:id = "listFriends" prefHeight="217.6" prefWidth="180.0" />
                   </VBox>
                </HBox>
                <HBox prefHeight="100.0" prefWidth="780.0">
@@ -33,12 +33,13 @@
                   <TextField fx:id="sendField" />
                   <Button fx:id="startGameBtn" mnemonicParsing="false" onAction="#handleRandomGame" text="start random game" />
                   <Button fx:id="drawBtn" mnemonicParsing="false" onAction="#drawBtnHandler" prefHeight="25.0" prefWidth="102.0" text="request draw" />
-                  <Button fx:id="friendBtn" mnemonicParsing="false" text="Add Friend" onAction="#friendBtnHandler">
+                  <Button fx:id = "resignBtn" mnemonicParsing="false" prefHeight="25.0" prefWidth="62.0" text="Resign" onAction = "#resignBtnHandler"/>
+                  <Button fx:id="friendBtn" mnemonicParsing="false" onAction="#friendBtnHandler" text="Add Friend">
                      <HBox.margin>
-                        <Insets left="142.0" />
+                        <Insets />
                      </HBox.margin>
                   </Button>
-                  <TextField fx:id="friendField"/>
+                  <TextField fx:id="friendField" />
                </HBox>
                <HBox prefHeight="100.0" prefWidth="200.0">
                   <children>

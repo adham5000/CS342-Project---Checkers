@@ -1,17 +1,4 @@
+
+as as 0 1 1
+da da 1 1 0
 test test 0 0 0
-as as 1 9 4
-da da 5 12 6
-Another test 0 0 0
-besian majmuni 0 0 0
-kapa kupa 0 0 0
-tupa rupa 0 0 0
-s ss 0 0 0
-t tt 0 0 0
-q qq 0 0 0
-za zaza 0 0 0
-ra rara 0 0 0
-e ee 0 0 0
-2 22 0 0 0
-1 11 0 0 0
-22 222 0 0 0
-rrrrrr rrrrrrrrrr 0 0 0

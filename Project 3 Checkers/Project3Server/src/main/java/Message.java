@@ -1,3 +1,4 @@
+import java.awt.*;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,6 +16,7 @@ public class Message implements Serializable {
         SCORES,
         FRIENDS,
         FRIEND_REQUEST,
+        RESIGN,
     }
 
     public static class MyWinDrawLoss implements Serializable {
@@ -48,9 +50,9 @@ public class Message implements Serializable {
         this.stringMessage = stringMessage;
         this.type = messageType.GLOBAL;
     }
-    public Message(HashSet<String> friends) {
+    public Message(HashSet<String> friends, messageType type) {
         this.friends = friends;
-        this.type = messageType.FRIENDS;
+        this.type = type;
     }
     public Message(String stringMessage, messageType type) {
         this.stringMessage = stringMessage;

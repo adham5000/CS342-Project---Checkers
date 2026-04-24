@@ -17,10 +17,12 @@ public class CheckersAPI {
     @FXML private ListView<String> chatList;
     @FXML private ListView<String> listUsers;
     @FXML private ListView<String> listMoves;
+    @FXML private ListView<String> listFriends;
+
     @FXML private TextField friendField;
     @FXML private TextField passfield;
     @FXML private TextField userfield;
-    @FXML private Button friendBtn;
+    @FXML private Button resignBtn;
     @FXML private Button startGameBtn;
     @FXML private Button drawBtn;
     @FXML private Button sendBtn;
@@ -75,6 +77,7 @@ public class CheckersAPI {
             }
         }
         drawBtn.setDisable(true);
+        resignBtn.setDisable(true);
         player1Name.setText(myName);
     }
 
@@ -114,6 +117,7 @@ public class CheckersAPI {
         else if(msg.msgType() == Message.messageType.GAME_START){
             startGameBtn.setDisable(true);
             drawBtn.setDisable(false);
+            resignBtn.setDisable(false);
             if(Objects.equals(msg.returnMessage(), "RED")){
                 myColor = "RED";
                 player2Name.setText(msg.getActiveUsers().get(1));
@@ -224,6 +228,7 @@ public class CheckersAPI {
             myColor = "";
             listMoves.getItems().add((msg.returnMessage()));
             startGameBtn.setDisable(false);
+            resignBtn.setDisable(true);
             drawBtn.setDisable(true);
         }
         else if (msg.msgType() == Message.messageType.SCORES){
@@ -243,7 +248,10 @@ public class CheckersAPI {
             System.out.println(msg.getWinDrawLoss().wins + " " + msg.getWinDrawLoss().draws + " " + msg.getWinDrawLoss().losses);
         }
         else if (msg.msgType() == Message.messageType.FRIENDS){
-            setFriends(msg.getFriends());
+            System.out.println(msg.getFriends());
+            listFriends.getItems().clear();
+            HashSet<String> friends = msg.getFriends();
+            listFriends.getItems().addAll(friends);
         }
         else {
             chatList.getItems().add(msg.returnMessage());
@@ -310,11 +318,9 @@ public class CheckersAPI {
         client.send(msg);
     }
     public void setFriends(HashSet<String> newFriends) {
-        // Update the existing set instead of replacing the reference
-        this.friends.clear();
-        this.friends.addAll(newFriends);
+        friends.clear();
+        friends.addAll(newFriends);
 
-        // Only set the cell factory once
         if (listUsers.getCellFactory() == null) {
             listUsers.setCellFactory(lv -> new ListCell<String>() {
                 @Override
@@ -329,8 +335,7 @@ public class CheckersAPI {
 
                     setText(item);
 
-                    // Use the FIELD, not a captured parameter
-                    if (CheckersAPI.this.friends.contains(item)) {
+                    if (friends.contains(item)) {
                         setStyle("-fx-background-color: lightgreen; -fx-font-weight: bold;");
                     } else {
                         setStyle("");
@@ -339,8 +344,10 @@ public class CheckersAPI {
             });
         }
 
-        listUsers.refresh();
+
+        listUsers.layout();
     }
+
 
     @FXML
     public void friendBtnHandler(ActionEvent event) {
@@ -350,5 +357,10 @@ public class CheckersAPI {
             msg = new Message(friend, Message.messageType.FRIEND_REQUEST);
             client.send(msg);
         }
+    }
+    @FXML
+    public void resignBtnHandler(ActionEvent event) {
+        Message msg = new Message(Message.messageType.RESIGN);
+        client.send(msg);
     }
 }

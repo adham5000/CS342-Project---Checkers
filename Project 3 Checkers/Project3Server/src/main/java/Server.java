@@ -189,7 +189,7 @@ public class Server {
 
 							HashSet<String> friends = new HashSet<>();
 							friendsMap.put(data.getActiveUsers().get(0), friends);
-							msg = new Message(friends);
+							msg = new Message(friends, Message.messageType.FRIENDS);
 							out.writeObject(msg);
 						}
 						else if(userInfo.containsKey(data.getActiveUsers().get(0)) && userInfo.get(data.getActiveUsers().get(0)).equals(data.getActiveUsers().get(1))){
@@ -212,10 +212,35 @@ public class Server {
 								friendsMap.put(data.getActiveUsers().get(0), friends);
 							}
 							HashSet<String> temp = friendsMap.get(data.getActiveUsers().get(0));
-
-							msg = new Message(temp);
+							temp.retainAll(userNames.values());
+							out.reset();
+							msg = new Message(temp, Message.messageType.FRIENDS);
 							out.writeObject(msg);
 
+							String loggedInUser = data.getActiveUsers().get(0);
+							for (String friend : friendsMap.get(loggedInUser)) {
+								friendsMap.putIfAbsent(friend, new HashSet<>());
+								friendsMap.get(friend).add(loggedInUser);
+							}
+// 1. Send logged-in user's friends list to them (you already do this)
+
+// 2. Update all users who have THIS user as a friend
+							for (ClientThread c : clients) {
+								String other = userNames.get(c.count);
+								if (other == null) continue;
+
+								// If other user has loggedInUser as a friend
+								if (friendsMap.getOrDefault(other, new HashSet<>()).contains(loggedInUser)) {
+
+									HashSet<String> updated = new HashSet<>(friendsMap.get(other));
+									updated.retainAll(userNames.values()); // only online friends
+
+									try {
+										c.out.reset();
+										c.out.writeObject(new Message(updated, Message.messageType.FRIENDS));
+									} catch (Exception ignored) {}
+								}
+							}
 						}
 						else {
 							msg = new Message("", Message.messageType.USERNAME);
@@ -376,6 +401,62 @@ public class Server {
 							game.getOpponent(this).out.writeObject(msg);
 						}
 					}
+					else if(data.msgType() == Message.messageType.RESIGN && game!=null){
+						if(playerColor == 1){
+							game.getRedPlayer().clientScore.losses++;
+							game.getWhitePlayer().clientScore.wins++;
+
+							out.reset();
+							msg = new Message(clientScore,Message.messageType.SCORES);
+							out.writeObject(msg);
+
+							out.reset();
+							msg = new Message("OPPONENT",game.getOpponent(this).clientScore,Message.messageType.SCORES);
+							out.writeObject(msg);
+
+							game.getOpponent(this).out.reset();
+							msg = new Message(game.getOpponent(this).clientScore,Message.messageType.SCORES);
+							game.getOpponent(this).out.writeObject(msg);
+
+							game.getOpponent(this).out.reset();
+							msg = new Message("OPPONENT",clientScore,Message.messageType.SCORES);
+							game.getOpponent(this).out.writeObject(msg);
+
+							msg = new Message("WHITE WON", Message.messageType.GAME_OVER);
+							game.getRedPlayer().out.writeObject(msg);
+							msg = new Message("YOU WON", Message.messageType.GAME_OVER);
+							game.getWhitePlayer().out.writeObject(msg);
+							activeGames.remove(game);
+							game = null;
+						}
+						else{
+							game.getRedPlayer().clientScore.wins++;
+							game.getWhitePlayer().clientScore.losses++;
+
+							out.reset();
+							msg = new Message(clientScore,Message.messageType.SCORES);
+							out.writeObject(msg);
+
+							out.reset();
+							msg = new Message("OPPONENT",game.getOpponent(this).clientScore,Message.messageType.SCORES);
+							out.writeObject(msg);
+
+							game.getOpponent(this).out.reset();
+							msg = new Message(game.getOpponent(this).clientScore,Message.messageType.SCORES);
+							game.getOpponent(this).out.writeObject(msg);
+
+							game.getOpponent(this).out.reset();
+							msg = new Message("OPPONENT",clientScore,Message.messageType.SCORES);
+							game.getOpponent(this).out.writeObject(msg);
+
+							msg = new Message("RED WON", Message.messageType.GAME_OVER);
+							game.getWhitePlayer().out.writeObject(msg);
+							msg = new Message("YOU WON", Message.messageType.GAME_OVER);
+							game.getRedPlayer().out.writeObject(msg);
+							activeGames.remove(game);
+							game = null;
+						}
+					}
 					else if (data.msgType() == Message.messageType.FRIEND_REQUEST) {
 
 						String sender = userNames.get(count);
@@ -390,16 +471,22 @@ public class Server {
 
 						// If target already requested sender → auto-friend
 						if (pendingRequests.get(sender).contains(target)) {
-							System.out.println(userNames.get(count) + " " + sender + " " + target);
+
 							friendsMap.get(sender).add(target);
 							friendsMap.get(target).add(sender);
-
+							System.out.println(friendsMap.get(target) + " HERE");
 							// Send updated lists
-							out.writeObject(new Message(friendsMap.get(sender)));
+							out.reset();
+							HashSet<String> friends = friendsMap.get(sender);
+							friends.retainAll(userNames.values());
+							out.writeObject(new Message(friends, Message.messageType.FRIENDS));
 
 							for (ClientThread c : clients) {
 								if (Objects.equals(userNames.get(c.count), target)) {
-									c.out.writeObject(new Message(friendsMap.get(target)));
+									friends = friendsMap.get(target);
+									friends.retainAll(userNames.values());
+									c.out.reset();
+									c.out.writeObject(new Message(friends,Message.messageType.FRIENDS));
 								}
 							}
 						}
@@ -410,6 +497,7 @@ public class Server {
 							// Notify target with a simple message (your client expects this)
 							for (ClientThread c : clients) {
 								if (Objects.equals(userNames.get(c.count), target)) {
+									c.out.reset();
 									c.out.writeObject(new Message(sender + " requested to be your friend"));
 								}
 							}
@@ -453,6 +541,7 @@ public class Server {
 							if (p[0].equals(userNames.get(count))) {
 								String friends = String.join(" ", friendsMap.get(userNames.get(count)));
 								lines.set(i, p[0] + " " + friends);
+
 								break;
 							}
 						}
@@ -464,8 +553,26 @@ public class Server {
 					}
 					msg = new Message("Client #" + count + " has left the server!");
 					updateClients(msg);
+					String disconnectedUser = userNames.get(count);
 
+// Update all users who had THIS user as a friend
 					userNames.remove(count);
+					for (ClientThread c : clients) {
+						String other = userNames.get(c.count);
+						if (other == null) continue;
+
+						// If OTHER user had disconnectedUser as a friend
+						if (friendsMap.getOrDefault(other, new HashSet<>()).contains(disconnectedUser)) {
+
+							HashSet<String> updated = new HashSet<>(friendsMap.get(other));
+							updated.retainAll(userNames.values()); // only online friends
+
+							try {
+								c.out.reset();
+								c.out.writeObject(new Message(updated, Message.messageType.FRIENDS));
+							} catch (Exception ignored) {}
+						}
+					}
 					clients.remove(this);
 					waitList.remove(this);
 					ArrayList<String> tempList = new ArrayList<>(userNames.values());

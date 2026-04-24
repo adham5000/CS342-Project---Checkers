@@ -1,3 +1,4 @@
+import java.awt.*;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,13 +16,14 @@ public class Message implements Serializable {
         SCORES,
         FRIENDS,
         FRIEND_REQUEST,
+        RESIGN,
     }
 
     public static class MyWinDrawLoss implements Serializable {
         private static final long serialVersionUID = 1L;
-        public final int wins;
-        public final int draws;
-        public final int losses;
+        public int wins;
+        public int draws;
+        public int losses;
 
         public MyWinDrawLoss(int wins, int draws, int losses) {
             this.wins = wins;
@@ -48,9 +50,9 @@ public class Message implements Serializable {
         this.stringMessage = stringMessage;
         this.type = messageType.GLOBAL;
     }
-    public Message(HashSet<String> friends) {
+    public Message(HashSet<String> friends, messageType type) {
         this.friends = friends;
-        this.type = messageType.FRIENDS;
+        this.type = type;
     }
     public Message(String stringMessage, messageType type) {
         this.stringMessage = stringMessage;
@@ -61,7 +63,7 @@ public class Message implements Serializable {
         this.winDrawLoss = scores;
         this.type = type;
     }
-    public Message(String stringMessage,MyWinDrawLoss scores, messageType type) {
+    public Message(String stringMessage, MyWinDrawLoss scores, messageType type) {
         this.stringMessage = stringMessage;
         this.winDrawLoss = scores;
         this.type = type;
@@ -104,6 +106,7 @@ public class Message implements Serializable {
         this.type = type;
     }
 
+    public HashSet<String> getFriends() {return friends;}
     public int getFromRow() {
         return fromRow;
     }
@@ -128,7 +131,6 @@ public class Message implements Serializable {
     public int getCapturedCol() {
         return capturedCol;
     }
-    public HashSet<String> getFriends() {return friends;}
     public String returnMessage() {return stringMessage;}
     public messageType msgType() {return type;}
     public ArrayList<String> getActiveUsers() { return Users; }
