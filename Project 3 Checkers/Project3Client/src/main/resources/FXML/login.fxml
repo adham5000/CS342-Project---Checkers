@@ -18,7 +18,7 @@
                   <Label text="Password: " styleClass="defaultLabel"/>
                   <TextField fx:id="passfield" styleClass="defaultTextField"/>
                </HBox>
-               <Label fx:id="erroruser" text="Error: Wrong Password/No Password entered" visible="false"
+               <Label fx:id="erroruser" text="Error" visible="false"
                       styleClass="defaultLabel"/>
             </VBox>
             <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
