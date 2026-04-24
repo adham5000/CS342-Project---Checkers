@@ -108,7 +108,11 @@ public class CheckersAPI {
 
                     controller.buildBoard();
 
-                    stage.setScene(new Scene(root));
+                    Scene scene = new Scene(root);
+                    scene.getStylesheets().add(
+                            getClass().getResource("/STYLES/scene1.css").toExternalForm()
+                    );
+                    stage.setScene(scene);
                     Message message = new Message(Message.messageType.ACK);
                     client.send(message);
                 }

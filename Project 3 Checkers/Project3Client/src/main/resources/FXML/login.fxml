@@ -3,7 +3,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="CheckersAPI">
+<AnchorPane prefHeight="300.0" prefWidth="500.0" styleClass="root" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="CheckersAPI">
    <children>
       <BorderPane layoutY="-1.0" prefHeight="600.0" prefWidth="800.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
          <center>
@@ -13,21 +13,21 @@
                      <children>
                           <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
                              <children>
-                                <Label text="Username: " />
-                                <TextField fx:id="userfield" />
+                                <Label text="Username: " styleClass="defaultLabel" />
+                                <TextField fx:id="userfield" styleClass="defaultTextField"/>
                              </children>
                           </HBox>
                           <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
                              <children>
-                                <Label text="Password: " />
-                                <TextField fx:id = "passfield"/>
+                                <Label text="Password: " styleClass="defaultLabel"/>
+                                <TextField fx:id="passfield" styleClass="defaultTextField"/>
                              </children>
                           </HBox>
-                           <Label fx:id="erroruser" visible="false" text="Error: Wrong Password/No Password entered" />
+                           <Label fx:id="erroruser" text="Error: Wrong Password/No Password entered" visible="false" styleClass="defaultLabel" />
                      </children>
                   </VBox>
                   <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
-                     <Button alignment="CENTER" mnemonicParsing="false" onAction="#handleStartGame" text="Play Game" />
+                     <Button alignment="CENTER" styleClass="defaultButton" mnemonicParsing="false" onAction="#handleStartGame" text="Play Game" />
                   </HBox>
                </children>
             </VBox>
