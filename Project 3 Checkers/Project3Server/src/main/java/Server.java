@@ -119,7 +119,9 @@ public class Server {
 				for (int i = 0; i < clients.size(); i++) {
 					ClientThread t = clients.get(i);
 					try {
-						t.out.writeObject(message);
+						if(userNames.containsKey(t.count)) {
+							t.out.writeObject(message);
+						}
 					}
 					catch(Exception e) {}
 				}
